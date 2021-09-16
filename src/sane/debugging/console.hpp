@@ -5,6 +5,9 @@
 
 #include <imgui.h>
 
+#define CreateDbgConsole(title)  Sane::Console console(title);
+#define UpdateDbgConsole() PROCESS_LOGS(console);
+
 namespace Sane
 {
     class Console

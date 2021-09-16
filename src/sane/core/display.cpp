@@ -3,7 +3,7 @@
 #include "sane/debugging/logging.hpp"
 
 namespace Sane {
-  Display::Display(const char* Name, int Width, int Height) {
+  Display::Display(const char* Name, size_t Width, size_t Height) {
     glfwSetErrorCallback(error_callback);
 
     if (!glfwInit())
@@ -15,7 +15,7 @@ namespace Sane {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    window = glfwCreateWindow(Width, Height, Name, NULL, NULL);
+    window = glfwCreateWindow(static_cast<int>(Width), static_cast<int>(Height), Name, NULL, NULL);
     if (!window) {
       glfwTerminate();
       exit(EXIT_FAILURE);
