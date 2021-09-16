@@ -1,10 +1,8 @@
 #pragma once
 
-#include "dlldefines.hpp"
-
 namespace Sane
 {
-    class SANE_EXPORT App
+    class App
     {
     public:
         App();

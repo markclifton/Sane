@@ -3,11 +3,6 @@
 #include <sstream>
 #include <functional>
 
-#include <iostream>
-using namespace std;
-
-#include "dlldefines.hpp"
-
 #define ENABLE_LOGS(SEVERITY) Sane::Log::Get().Create(SEVERITY);
 #define DISABLE_LOGS() Sane::Log::Get().Destroy();
 #define PROCESS_LOGS(fn) Sane::Log::Get().Process(fn);
@@ -19,7 +14,7 @@ using namespace std;
 
 namespace Sane
 {
-    std::string SANE_EXPORT time_now();
+    std::string time_now();
 
     enum SEVERITY {
         DEBUG = 0,
@@ -28,7 +23,7 @@ namespace Sane
         FATAL = 3
     };
 
-    class SANE_EXPORT Log {
+    class Log {
     public:
         static Log& Get();
         void Create(SEVERITY minLevel = SEVERITY::DEBUG);

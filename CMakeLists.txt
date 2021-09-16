@@ -10,14 +10,24 @@ file(GLOB_RECURSE SRC_FILES
     src/*.cpp
 )
 
-add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX2")
+
+add_library(${PROJECT_NAME} ${SRC_FILES})
 
 target_include_directories(${PROJECT_NAME} PUBLIC 
-    ${CMAKE_SOURCE_DIR}/dependencies/sane/src
+    ${CMAKE_SOURCE_DIR}/dependencies/sane-engine/src
+    ${CMAKE_SOURCE_DIR}/dependencies/glad/include
+    ${CMAKE_SOURCE_DIR}/dependencies/glfw/include
+    ${CMAKE_SOURCE_DIR}/dependencies/glm
     ${CMAKE_SOURCE_DIR}/dependencies/imgui_wrapper/imgui
-    ${CMAKE_SOURCE_DIR}/dependencies/imgui_wrapper/imgui/backends       
+    ${CMAKE_SOURCE_DIR}/dependencies/imgui_wrapper/imgui/backends 
 )
 
+find_package(OpenGL REQUIRED)
 target_link_libraries(${PROJECT_NAME}
+    glad
+    glfw
+    glm
     imgui
+    OpenGL::GL
 )

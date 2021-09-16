@@ -1,6 +1,6 @@
 #pragma once
 
-#include "app.hpp"
+#include <sane/core/app.hpp>
 
 extern Sane::App* CreateApp();
 
