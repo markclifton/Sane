@@ -2,9 +2,30 @@
 
 #include "sane/debugging/logging.hpp"
 
+namespace
+{
+  void key_forwarder(GLFWwindow* window, int key, int scancode, int action, int mods)
+  {
+    glfwGetWindowUserPointer(window);
+  }
+
+  void cursor_forwarder(GLFWwindow* window, double xpos, double ypos)
+  {
+    glfwGetWindowUserPointer(window);
+  }
+
+  void mouse_forwarder(GLFWwindow* window, int button, int action, int mods)
+  {
+    glfwGetWindowUserPointer(window);
+  }
+
+  static void error_callback(int error, const char* description) {
+    SANE_WARN(description);
+  }
+}
+
 namespace Sane {
   Display::Display(const char* Name, size_t Width, size_t Height) {
-    glfwSetErrorCallback(error_callback);
 
     if (!glfwInit())
       exit(EXIT_FAILURE);
@@ -21,7 +42,11 @@ namespace Sane {
       exit(EXIT_FAILURE);
     }
 
-    glfwSetKeyCallback(window, key_callback);
+    glfwSetErrorCallback(error_callback);
+    glfwSetWindowUserPointer(window, this);
+    glfwSetKeyCallback(window, key_forwarder);
+    glfwSetCursorPosCallback(window, cursor_forwarder);
+    glfwSetMouseButtonCallback(window, mouse_forwarder);
 
     glfwMakeContextCurrent(window);
     gladLoadGL(glfwGetProcAddress);
