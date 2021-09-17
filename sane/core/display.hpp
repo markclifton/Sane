@@ -9,7 +9,8 @@
 
 #include <entt/entt.hpp>
 
-namespace Sane {
+namespace Sane
+{
   class Display {
   public:
     Display(const char* Name, size_t Width, size_t Height);

@@ -7,9 +7,9 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${BuildDir}/${CMAKE_BUILD_TYPE})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${BuildDir}/${CMAKE_BUILD_TYPE})
 
 file(GLOB_RECURSE SRC_FILES
-    ${CMAKE_SOURCE_DIR}/dependencies/glad/src/**.c
+    ${PROJECT_SOURCE_DIR}/src/**.c
 )
 
 add_library(${PROJECT_NAME} ${SRC_FILES})
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/dependencies/glad/include)
+target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/include)
