@@ -4,8 +4,10 @@
 
 #include "sane/utils/noncopyable.hpp"
 
-namespace Sane {
-  class Buffer : public NonCopyable {
+namespace Sane
+{
+  class Buffer : public NonCopyable
+  {
   public:
     Buffer(GLenum target);
     ~Buffer();

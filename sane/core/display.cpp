@@ -24,9 +24,10 @@ namespace
   }
 }
 
-namespace Sane {
-  Display::Display(const char* Name, size_t Width, size_t Height) {
-
+namespace Sane
+{
+  Display::Display(const char* Name, size_t Width, size_t Height)
+  {
     if (!glfwInit())
       exit(EXIT_FAILURE);
 

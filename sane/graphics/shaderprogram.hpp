@@ -4,8 +4,10 @@
 
 #include "sane/utils/noncopyable.hpp"
 
-namespace Sane {
-  class ShaderProgram : public NonCopyable {
+namespace Sane
+{
+  class ShaderProgram : public NonCopyable
+  {
   public:
     ShaderProgram(const char* VS_Contents, const char* FS_Contents);
     ~ShaderProgram();
@@ -23,7 +25,8 @@ namespace Sane {
     GLuint fragment_shader;
   };
 
-  class VertexAttrib {
+  class VertexAttrib
+  {
   public:
     VertexAttrib(GLint location, GLint size, GLenum type, GLboolean normalized,
       GLsizei stride, const void* pointer);

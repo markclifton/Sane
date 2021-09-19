@@ -5,8 +5,10 @@
 
 #include "sane/debugging/logging.hpp"
 
-namespace Sane {
-  ShaderProgram::ShaderProgram(const char* VS_Contents, const char* FS_Contents) {
+namespace Sane
+{
+  ShaderProgram::ShaderProgram(const char* VS_Contents, const char* FS_Contents)
+  {
     GLint compiled;
 
     vertex_shader = glCreateShader(GL_VERTEX_SHADER);
@@ -54,15 +56,23 @@ namespace Sane {
     glDeleteShader(fragment_shader);
   }
 
-  ShaderProgram::~ShaderProgram() { glDeleteProgram(program); }
+  ShaderProgram::~ShaderProgram()
+  {
+    glDeleteProgram(program);
+  }
 
-  void ShaderProgram::Bind() { glUseProgram(program); }
+  void ShaderProgram::Bind()
+  {
+    glUseProgram(program);
+  }
 
-  const GLuint ShaderProgram::GetUniformLocaition(const char* name) {
+  const GLuint ShaderProgram::GetUniformLocaition(const char* name)
+  {
     return glGetUniformLocation(program, name);
   }
 
-  const GLuint ShaderProgram::GetAttribLocation(const char* name) {
+  const GLuint ShaderProgram::GetAttribLocation(const char* name)
+  {
     return glGetAttribLocation(program, name);
   }
 
@@ -72,9 +82,12 @@ namespace Sane {
     : location(location), size(size), type(type), normalized(normalized),
     stride(stride), pointer(pointer) {}
 
-  VertexAttrib::~VertexAttrib() {}
+  VertexAttrib::~VertexAttrib()
+  {
+  }
 
-  void VertexAttrib::Enable() {
+  void VertexAttrib::Enable()
+  {
     glEnableVertexAttribArray(location);
     glVertexAttribPointer(location, size, type, normalized, stride, pointer);
   }

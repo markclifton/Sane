@@ -1,6 +1,7 @@
 #pragma once
 
-class NonCopyable {
+class NonCopyable 
+{
 public:
   NonCopyable() = default;
   ~NonCopyable() = default;
