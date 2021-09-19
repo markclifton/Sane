@@ -20,6 +20,9 @@ namespace Sane {
       glGetShaderInfoLog(vertex_shader, log_length, nullptr, v.data());
       std::string err(begin(v), end(v));
 
+      err.pop_back();
+      err.pop_back();
+
       glDeleteShader(vertex_shader);
       SANE_FATAL("Failed to compile vertex shader: " << err);
     }
@@ -34,6 +37,9 @@ namespace Sane {
       std::vector<char> v(static_cast<size_t>(log_length));
       glGetShaderInfoLog(fragment_shader, log_length, nullptr, v.data());
       std::string err(begin(v), end(v));
+
+      err.pop_back();
+      err.pop_back();
 
       glDeleteShader(fragment_shader);
       SANE_FATAL("Failed to compile fragment shader: " << err);

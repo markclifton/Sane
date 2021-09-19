@@ -8,7 +8,7 @@ namespace Sane
         : title(title)
     {
         Clear();
-        SANE_INFO("Created Console");
+        SANE_INFO("Successfully created debug console");
     }
 
     void Console::Clear()

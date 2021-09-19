@@ -11,6 +11,7 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/deps/glfw)
 add_subdirectory(${PROJECT_SOURCE_DIR}/deps/glm)
 add_subdirectory(${PROJECT_SOURCE_DIR}/deps/imgui_wrapper)
 add_subdirectory(${PROJECT_SOURCE_DIR}/deps/entt)
+add_subdirectory(${PROJECT_SOURCE_DIR}/deps/stb_image)
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -30,7 +31,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${PROJECT_SOURCE_DIR}/deps/entt/single_include/
     ${PROJECT_SOURCE_DIR}/deps/imgui_wrapper/imgui
     ${PROJECT_SOURCE_DIR}/deps/imgui_wrapper/imgui/backends
-    
 )
 
 if (${APPLE})
@@ -40,6 +40,7 @@ if (${APPLE})
     glm
     imgui
     EnTT::EnTT
+    stb_image
     )
 else()
     find_package(OpenGL REQUIRED)
@@ -50,5 +51,6 @@ else()
         imgui
         OpenGL::GL
         EnTT::EnTT
+        stb_image
     )
 endif()
