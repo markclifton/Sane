@@ -5,6 +5,7 @@
 
 namespace Sane
 {
+#if __APPLE__
     std::string time_now()
     {
         struct tm time_info;
@@ -16,6 +17,19 @@ namespace Sane
         time.pop_back();
         return time;
     }
+#else
+    std::string time_now()
+    {
+        struct tm time_info;
+        time_t time_create = std::time(NULL);
+        localtime_s(&time_info, &time_create);
+        char timebuf[26];
+        asctime_s(timebuf, sizeof(timebuf), &time_info);
+        std::string time(timebuf);
+        time.pop_back();
+        return time;
+    }
+#endif
 
     Log& Log::Get() {
         static Log log;
