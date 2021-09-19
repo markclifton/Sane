@@ -24,14 +24,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${PROJECT_SOURCE_DIR}/imgui/backends
 )
 
-if(${APPLE})
-    target_link_libraries(${PROJECT_NAME} 
-        glfw
-    )
-else()
-    find_package(OpenGL REQUIRED)
-    target_link_libraries(${PROJECT_NAME} 
-        glfw
-        OpenGL::GL
-    )
-endif()
+target_link_libraries(${PROJECT_NAME} 
+    glfw
+)
