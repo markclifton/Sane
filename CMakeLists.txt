@@ -20,8 +20,6 @@ file(GLOB_RECURSE SRC_FILES
     sane/*.cpp
 )
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX2")
-
 add_library(${PROJECT_NAME} ${SRC_FILES})
 
 target_include_directories(${PROJECT_NAME} PUBLIC 
@@ -35,12 +33,22 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     
 )
 
-find_package(OpenGL REQUIRED)
-target_link_libraries(${PROJECT_NAME}
+if (${APPLE})
+    target_link_libraries(${PROJECT_NAME}
     glad
     glfw
     glm
     imgui
-    OpenGL::GL
     EnTT::EnTT
-)
+    )
+else()
+    find_package(OpenGL REQUIRED)
+    target_link_libraries(${PROJECT_NAME}
+        glad
+        glfw
+        glm
+        imgui
+        OpenGL::GL
+        EnTT::EnTT
+    )
+endif()

@@ -1,6 +1,7 @@
 #include "logging.hpp"
 
 #include <iostream>
+#include <time.h>
 
 namespace Sane
 {
@@ -8,9 +9,9 @@ namespace Sane
     {
         struct tm time_info;
         time_t time_create = std::time(NULL);
-        localtime_s(&time_info, &time_create);
+        localtime_r(&time_create, &time_info);
         char timebuf[26];
-        asctime_s(timebuf, sizeof(timebuf), &time_info);
+        asctime_r(&time_info, timebuf);
         std::string time(timebuf);
         time.pop_back();
         return time;
