@@ -7,6 +7,10 @@
 #include <glm/ext.hpp>
 #include <glm/glm.hpp>
 
+extern float deltaX;
+extern float deltaY;
+extern float deltaZ;
+
 namespace Sane
 {
   class Display

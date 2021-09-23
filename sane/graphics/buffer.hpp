@@ -13,6 +13,7 @@ namespace Sane
     ~Buffer();
 
     void Bind();
+    void Unbind();
     void BufferData(GLsizeiptr size, const void* data, GLenum usage);
 
     operator GLuint() { return buffer; }

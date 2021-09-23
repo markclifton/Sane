@@ -20,6 +20,11 @@ namespace Sane
     glBindBuffer(target, buffer);
   }
 
+  void Buffer::Unbind()
+  {
+    glBindBuffer(target, 0);
+  }
+
   void Buffer::BufferData(GLsizeiptr size, const void* data, GLenum usage)
   {
     glBindBuffer(target, buffer);

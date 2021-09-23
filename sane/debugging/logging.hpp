@@ -3,7 +3,8 @@
 #include <sstream>
 #include <functional>
 
-#define ENABLE_LOGS(SEVERITY) Sane::Log::Get().Create(SEVERITY);
+#define ENABLE_LOGS() Sane::Log::Get().Create(Sane::SEVERITY::WARN);
+#define ENABLE_DEBUG_LOGS() Sane::Log::Get().Create(Sane::SEVERITY::DEBUG);
 #define DISABLE_LOGS() Sane::Log::Get().Destroy();
 #define PROCESS_LOGS(fn) Sane::Log::Get().Process(fn);
 

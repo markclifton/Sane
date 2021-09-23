@@ -1,7 +1,6 @@
 #include "logging.hpp"
 
-#include <iostream>
-#include <time.h>
+#include <ctime>
 
 namespace Sane
 {

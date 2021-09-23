@@ -7,6 +7,44 @@ namespace
   void key_forwarder(GLFWwindow* window, int key, int scancode, int action, int mods)
   {
     glfwGetWindowUserPointer(window);
+
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+      glfwSetWindowShouldClose(window, GLFW_TRUE);
+
+    if (key == GLFW_KEY_R && (action == GLFW_PRESS || action == GLFW_REPEAT))
+      deltaZ = -.01f;
+    if (key == GLFW_KEY_R && action == GLFW_RELEASE)
+      deltaZ = 0;
+
+    if (key == GLFW_KEY_F && (action == GLFW_PRESS || action == GLFW_REPEAT))
+      deltaZ = .01f;
+    if (key == GLFW_KEY_F && action == GLFW_RELEASE)
+      deltaZ = 0;
+
+    if (key == GLFW_KEY_W && (action == GLFW_PRESS || action == GLFW_REPEAT))
+      deltaY = -.01f;
+    if (key == GLFW_KEY_W && action == GLFW_RELEASE)
+      deltaY = 0;
+
+    if (key == GLFW_KEY_S && (action == GLFW_PRESS || action == GLFW_REPEAT))
+      deltaY = .01f;
+    if (key == GLFW_KEY_S && action == GLFW_RELEASE)
+      deltaY = 0;
+
+    if (key == GLFW_KEY_A && (action == GLFW_PRESS || action == GLFW_REPEAT))
+      deltaX = -.01f;
+    if (key == GLFW_KEY_A && action == GLFW_RELEASE)
+      deltaX = 0;
+
+    if (key == GLFW_KEY_D && (action == GLFW_PRESS || action == GLFW_REPEAT))
+      deltaX = .01f;
+    if (key == GLFW_KEY_D && action == GLFW_RELEASE)
+      deltaX = 0;
+
+    if (key == GLFW_KEY_1 && (action == GLFW_PRESS))
+      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    if (key == GLFW_KEY_2 && (action == GLFW_PRESS))
+      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   }
 
   void cursor_forwarder(GLFWwindow* window, double xpos, double ypos)
@@ -68,8 +106,6 @@ namespace Sane
 
     glfwDestroyWindow(window);
     glfwTerminate();
-
-    exit(EXIT_SUCCESS);
   }
 
   void Display::Update() {

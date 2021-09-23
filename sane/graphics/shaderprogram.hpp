@@ -13,6 +13,7 @@ namespace Sane
     ~ShaderProgram();
 
     void Bind();
+    void Unbind();
 
     const GLuint GetUniformLocaition(const char* name);
     const GLuint GetAttribLocation(const char* name);
@@ -33,6 +34,7 @@ namespace Sane
     ~VertexAttrib();
 
     void Enable();
+    void Disable();
 
   private:
     GLint location;

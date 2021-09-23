@@ -95,7 +95,7 @@ namespace Sane
                     switch (line_start[1])
                     {
                     case 'D':
-                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(.2, .3, .8, 1));
+                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(.2f, .3f, .8f, 1.f));
                         break;
                     case 'I':
                         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0, 1, 0, 1));

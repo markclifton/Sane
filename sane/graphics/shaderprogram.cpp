@@ -66,6 +66,11 @@ namespace Sane
     glUseProgram(program);
   }
 
+  void ShaderProgram::Unbind()
+  {
+    glUseProgram(0);
+  }
+
   const GLuint ShaderProgram::GetUniformLocaition(const char* name)
   {
     return glGetUniformLocation(program, name);
@@ -90,5 +95,10 @@ namespace Sane
   {
     glEnableVertexAttribArray(location);
     glVertexAttribPointer(location, size, type, normalized, stride, pointer);
+  }
+
+  void VertexAttrib::Disable()
+  {
+    glDisableVertexAttribArray(location);
   }
 }
