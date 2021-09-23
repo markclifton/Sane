@@ -6,8 +6,8 @@ namespace Sane
     {
     public:
         App();
-        virtual ~App();
-        virtual void Run();
+        virtual ~App() = default;
+        virtual void Run() = 0;
     };
 
     App* CreateApp();

@@ -12,12 +12,4 @@ namespace Sane
         FreeConsole();
 #endif
     }
-
-    App::~App()
-    {
-    }
-
-    void App::Run()
-    {
-    }
 }
