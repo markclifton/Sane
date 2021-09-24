@@ -29,6 +29,6 @@ namespace Sane
   {
     glBindBuffer(target, buffer);
     glBufferData(target, size, data, usage);
-    SANE_INFO("Buffered data for buffer: {0}", buffer);
+    // SANE_INFO("Buffered data for buffer: {0}", buffer);
   }
 }

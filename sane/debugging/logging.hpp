@@ -14,13 +14,6 @@
 
 namespace Sane {
     namespace Logging {
-        const ImColor TXT_DBG_CLR{ 0.5f, 0.5f, 0.5f, 1.0f };
-
-        const ImColor LVL_DBG_CLR{ 0.0f, 1.0f, 0.8f, 1.0f };
-        const ImColor LVL_LOG_CLR{ 0.65f, 0.2f, 1.0f, 1.0f };
-        const ImColor LVL_ERR_CLR{ 1.0f, 0.0f, 0.0f, 1.0f };
-        const ImColor LVL_WRN_CLR{ 1.0f, 0.5f, 0.0f, 1.0f };
-
         class Log : public spdlog::sinks::base_sink<std::mutex>
         {
         public:
