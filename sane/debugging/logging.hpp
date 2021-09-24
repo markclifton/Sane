@@ -60,7 +60,7 @@ namespace Sane {
             bool visible{ true };
         };
 
-        typedef std::shared_ptr<Sane::Logging::Log> Mutex;
-        const Mutex SaneLogMutex();
+        typedef std::shared_ptr<Sane::Logging::Log> LogSink;
+        const LogSink GetLogSink();
     }
 }

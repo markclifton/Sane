@@ -7,7 +7,7 @@ namespace Sane
 {
 	namespace Logging
 	{
-		const Mutex SaneLogMutex() {
+		const LogSink GetLogSink() {
 			auto llog = spdlog::create<Log>(std::string("llog"));
 			spdlog::set_default_logger(llog);
 			return std::dynamic_pointer_cast<Log>(llog->sinks()[0]);
