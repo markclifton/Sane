@@ -26,7 +26,7 @@ namespace Sane
       err.pop_back();
 
       glDeleteShader(vertex_shader);
-      SANE_FATAL("Failed to compile vertex shader: " << err);
+      SANE_ERROR("Failed to compile vertex shader: {0}", err);
     }
 
     fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -44,7 +44,7 @@ namespace Sane
       err.pop_back();
 
       glDeleteShader(fragment_shader);
-      SANE_FATAL("Failed to compile fragment shader: " << err);
+      SANE_ERROR("Failed to compile fragment shader: {0}", err);
     }
 
     program = glCreateProgram();

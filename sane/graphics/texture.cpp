@@ -15,7 +15,7 @@ namespace Sane
         unsigned char* data = stbi_load(path, &width, &height, &nrChannels, 0);
         if (!data)
         {
-            SANE_FATAL("Failed to load texture: " << path);
+            SANE_ERROR("Failed to load texture: {}", path);
             return;
         }
 
@@ -39,7 +39,7 @@ namespace Sane
 
         stbi_image_free(data);
 
-        SANE_INFO("Successfully loaded texture: " << path);
+        SANE_ERROR("Successfully loaded texture: {}", path);
     }
 
     Texture::~Texture()

@@ -7,7 +7,7 @@ namespace Sane
   Buffer::Buffer(GLenum target) : target(target)
   {
     glGenBuffers(1, &buffer);
-    SANE_INFO("Successfully created buffer of type: " << target);
+    SANE_INFO("Successfully created buffer of type: {0}", target);
   }
 
   Buffer::~Buffer()
@@ -29,6 +29,6 @@ namespace Sane
   {
     glBindBuffer(target, buffer);
     glBufferData(target, size, data, usage);
-    SANE_INFO("Buffered data for buffer: " << buffer);
+    SANE_INFO("Buffered data for buffer: {0}", buffer);
   }
 }
