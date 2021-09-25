@@ -2,7 +2,12 @@
 
 namespace Sane
 {
-    void Console::Process()
+    Console::Console()
+        : Layer("Console")
+    {
+    }
+
+    void Console::Render()
     {
         logSink_->Render();
     }

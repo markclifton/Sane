@@ -3,7 +3,7 @@
 #include <mutex>
 #include <vector>
 
-#include "sane/layers/layer.hpp"
+#include "sane/layers/base.hpp"
 #include "sane/logging/log.hpp"
 
 namespace Sane
@@ -53,7 +53,7 @@ namespace Sane
             static Queue& Instance();
 
             static void Submit(Event& evt);
-            virtual void Process() override;
+            virtual void Update() override;
 
         private:
             static void AddListener(Listener* listener);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sane/layers/layer.hpp"
+#include "sane/layers/base.hpp"
 #include "sane/logging/log.hpp"
 
 namespace Sane
@@ -8,7 +8,8 @@ namespace Sane
     class Console : public Layer
     {
     public:
-        virtual void Process() override;
+        Console();
+        virtual void Render() override;
 
     private:
         const Logging::LogSink logSink_{ Logging::GetLogSink() };

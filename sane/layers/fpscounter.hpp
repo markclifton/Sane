@@ -1,12 +1,13 @@
 #pragma once
 
-#include "sane/layers/layer.hpp"
+#include "sane/layers/base.hpp"
 
 namespace Sane
 {
     class FpsCounter : public Layer
     {
     public:
-        virtual void Process() override;
+        FpsCounter();
+        virtual void Render() override;
     };
 }

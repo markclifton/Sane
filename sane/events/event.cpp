@@ -53,7 +53,7 @@ namespace Sane
             Instance().events_.push_back(new Event(evt.action, evt.detailedAction, evt.data, evt.size));
         }
 
-        void Queue::Process()
+        void Queue::Update()
         {
             std::lock_guard<std::mutex> lock(Instance().processingMutex_);
 

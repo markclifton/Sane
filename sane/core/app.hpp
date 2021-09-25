@@ -1,21 +1,33 @@
 #pragma once
 
+#include "sane/core/display.hpp"
 #include "sane/events/event.hpp"
-#include "sane/layers/layer.hpp"
+#include "sane/layers/base.hpp"
+#include "sane/layers/imgui.hpp"
 
 namespace Sane
 {
     class App
     {
     public:
-        App();
+        App(const char* name);
         virtual ~App() = default;
-        virtual void Run() = 0;
+        void Run();
 
-    protected:
-        Sane::LayerStack layers_;
-        Sane::LayerStack overlay_layers_;
-        Sane::Events::Queue& evt_queue_;
+        void PushLayer(Layer* layer);
+        void PushOverlay(Layer* layer);
+        void PopLayer(Layer* layer);
+        void PopOverlay(Layer* layer);
+
+    private:
+        const size_t WIDTH = 1280;
+        const size_t HEIGHT = 720;
+
+        Events::Queue& evt_queue_;
+        Layers::Stack layers_;
+
+        Display display_;
+        ImguiIntegration imgui_;
     };
 
     App* CreateApp();

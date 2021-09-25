@@ -4,7 +4,12 @@
 
 namespace Sane
 {
-    void FpsCounter::Process()
+    FpsCounter::FpsCounter()
+        : Layer("FpsCounter")
+    {
+    }
+
+    void FpsCounter::Render()
     {
         if (ImGui::Begin("Framerate"))
         {
