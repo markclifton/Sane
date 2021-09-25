@@ -7,11 +7,11 @@
 namespace Sane
 {
     App::App()
-        : evt_queue(EventQueue::Instance())
+        : evt_queue_(Events::Queue::Instance())
     {
 #if defined(WIN32)
         FreeConsole();
 #endif
-        layers.PushLayer(&evt_queue);
+        layers_.PushLayer(&evt_queue_);
     }
 }

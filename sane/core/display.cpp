@@ -4,61 +4,24 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-#include "sane/debugging/logging.hpp"
+#include "sane/events/inputs.hpp"
+#include "sane/logging/log.hpp"
 
 namespace
 {
   void key_forwarder(GLFWwindow* window, int key, int scancode, int action, int mods)
   {
-    glfwGetWindowUserPointer(window);
-
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-      glfwSetWindowShouldClose(window, GLFW_TRUE);
-
-    if (key == GLFW_KEY_R && (action == GLFW_PRESS || action == GLFW_REPEAT))
-      deltaZ = -.01f;
-    if (key == GLFW_KEY_R && action == GLFW_RELEASE)
-      deltaZ = 0;
-
-    if (key == GLFW_KEY_F && (action == GLFW_PRESS || action == GLFW_REPEAT))
-      deltaZ = .01f;
-    if (key == GLFW_KEY_F && action == GLFW_RELEASE)
-      deltaZ = 0;
-
-    if (key == GLFW_KEY_W && (action == GLFW_PRESS || action == GLFW_REPEAT))
-      deltaY = -.01f;
-    if (key == GLFW_KEY_W && action == GLFW_RELEASE)
-      deltaY = 0;
-
-    if (key == GLFW_KEY_S && (action == GLFW_PRESS || action == GLFW_REPEAT))
-      deltaY = .01f;
-    if (key == GLFW_KEY_S && action == GLFW_RELEASE)
-      deltaY = 0;
-
-    if (key == GLFW_KEY_A && (action == GLFW_PRESS || action == GLFW_REPEAT))
-      deltaX = -.01f;
-    if (key == GLFW_KEY_A && action == GLFW_RELEASE)
-      deltaX = 0;
-
-    if (key == GLFW_KEY_D && (action == GLFW_PRESS || action == GLFW_REPEAT))
-      deltaX = .01f;
-    if (key == GLFW_KEY_D && action == GLFW_RELEASE)
-      deltaX = 0;
-
-    if (key == GLFW_KEY_1 && (action == GLFW_PRESS))
-      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    if (key == GLFW_KEY_2 && (action == GLFW_PRESS))
-      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    Sane::Input::KeyHandler::Process(key, scancode, action, mods);
   }
 
   void cursor_forwarder(GLFWwindow* window, double xpos, double ypos)
   {
-    glfwGetWindowUserPointer(window);
+    Sane::Input::MouseHandler::Process(xpos, ypos);
   }
 
   void mouse_forwarder(GLFWwindow* window, int button, int action, int mods)
   {
-    glfwGetWindowUserPointer(window);
+    Sane::Input::MouseHandler::Process(button, action, mods);
   }
 
   static void error_callback(int error, const char* description) {
@@ -68,7 +31,7 @@ namespace
 
 namespace Sane
 {
-  Display::Display(const char* Name, size_t Width, size_t Height)
+  Display::Display(const char* name, int32_t width, int32_t height)
   {
     if (!glfwInit())
       exit(EXIT_FAILURE);
@@ -79,45 +42,45 @@ namespace Sane
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    window = glfwCreateWindow(static_cast<int>(Width), static_cast<int>(Height), Name, NULL, NULL);
-    if (!window) {
+    window_ = glfwCreateWindow(width, height, name, NULL, NULL);
+    if (!window_) {
       glfwTerminate();
       exit(EXIT_FAILURE);
     }
 
     glfwSetErrorCallback(error_callback);
-    glfwSetWindowUserPointer(window, this);
-    glfwSetKeyCallback(window, key_forwarder);
-    glfwSetCursorPosCallback(window, cursor_forwarder);
-    glfwSetMouseButtonCallback(window, mouse_forwarder);
+    glfwSetKeyCallback(window_, key_forwarder);
+    glfwSetCursorPosCallback(window_, cursor_forwarder);
+    glfwSetMouseButtonCallback(window_, mouse_forwarder);
 
-    glfwMakeContextCurrent(window);
+    glfwMakeContextCurrent(window_);
     gladLoadGL(glfwGetProcAddress);
     glfwSwapInterval(1);
 
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+    glGenVertexArrays(1, &vao_);
+    glBindVertexArray(vao_);
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    SANE_INFO("Successfully created display");
+    SANE_INFO("Created display");
   }
 
   Display::~Display() {
-    glDeleteVertexArrays(1, &vao);
-
-    glfwDestroyWindow(window);
+    glDeleteVertexArrays(1, &vao_);
+    glfwDestroyWindow(window_);
     glfwTerminate();
+
+    SANE_INFO("Destroyed display");
   }
 
   void Display::Update() {
-    glfwSwapBuffers(window);
+    glfwSwapBuffers(window_);
     glfwPollEvents();
 
-    int width, height;
-    glfwGetFramebufferSize(window, &width, &height);
+    int32_t width, height;
+    glfwGetFramebufferSize(window_, &width, &height);
     glViewport(0, 0, width, height);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -125,9 +88,8 @@ namespace Sane
 
   glm::mat4 Display::GetOrthoProjection() {
     float ratio;
-    int width, height;
-
-    glfwGetFramebufferSize(window, &width, &height);
+    int32_t width, height;
+    glfwGetFramebufferSize(window_, &width, &height);
     ratio = width / (float)height;
 
     return glm::ortho(-ratio, ratio, -1.f, 1.f, 1.f, -1.f);
@@ -135,9 +97,8 @@ namespace Sane
 
   glm::mat4 Display::GetPersProjection() {
     float ratio;
-    int width, height;
-
-    glfwGetFramebufferSize(window, &width, &height);
+    int32_t width, height;
+    glfwGetFramebufferSize(window_, &width, &height);
     ratio = width / (float)height;
     return glm::perspective(45.0f, ratio, 1.0f, 200.0f);
   }

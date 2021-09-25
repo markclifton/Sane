@@ -7,28 +7,26 @@
 #include <glm/ext.hpp>
 #include <glm/glm.hpp>
 
-extern float deltaX;
-extern float deltaY;
-extern float deltaZ;
+#include "sane/events/event.hpp"
 
 namespace Sane
 {
-  class Display
+  class Display : public Events::Dispatcher
   {
   public:
-    Display(const char* Name, size_t Width, size_t Height);
+    Display(const char* name, int32_t width, int32_t height);
     ~Display();
 
     void Update();
-    inline bool IsRunning() { return !glfwWindowShouldClose(window); }
+    inline bool IsRunning() { return !glfwWindowShouldClose(window_); }
 
     glm::mat4 GetOrthoProjection();
     glm::mat4 GetPersProjection();
 
-    operator GLFWwindow* () { return window; }
+    operator GLFWwindow* () { return window_; }
 
   private:
-    GLFWwindow* window;
-    GLuint vao;
+    GLFWwindow* window_;
+    uint32_t vao_;
   };
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glad/gl.h>
+#include <cstdint>
 #include <glm/glm.hpp>
 
 namespace Sane
@@ -8,21 +8,21 @@ namespace Sane
     class Framebuffer
     {
     public:
-        Framebuffer(size_t Width, size_t Height);
+        Framebuffer(int32_t width, int32_t height);
         ~Framebuffer();
 
-        void Resize(size_t Width, size_t Height);
+        void Resize(int32_t width, int32_t height);
         void Invalidate();
         void Bind();
         void Unbind();
         void Clear();
 
-        GLuint GetAttachment(size_t index);
-        glm::vec2 GetSize();
+        uint32_t GetAttachment(uint32_t index);
+        const glm::vec2 GetSize();
 
     private:
-        glm::vec2 size{ 0, 0 };
-        GLuint framebuffer{ 0 };
-        GLuint attachments[2]{ 0,0 };
+        glm::vec2 size_{ 0, 0 };
+        uint32_t framebuffer_{ 0 };
+        uint32_t attachments_[2]{ 0,0 };
     };
 }

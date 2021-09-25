@@ -1,7 +1,4 @@
-#include <sane/debugging/logging.hpp>
-
-#include <spdlog/spdlog.h>
-#include <spdlog/sinks/base_sink.h>
+#include "sane/logging/log.hpp"
 
 namespace Sane
 {
@@ -13,9 +10,14 @@ namespace Sane
 			return std::dynamic_pointer_cast<Log>(llog->sinks()[0]);
 		}
 
+		Log::Log()
+		{
+			Clear();
+		}
+
 		void Log::Render()
 		{
-			if (!ImGui::Begin("Log", &visible))
+			if (!ImGui::Begin("Console", &visible_))
 			{
 				ImGui::End();
 				return;
@@ -23,7 +25,7 @@ namespace Sane
 
 			if (ImGui::BeginPopup("Options"))
 			{
-				ImGui::Checkbox("Auto-scroll", &autoScroll);
+				ImGui::Checkbox("Auto-scroll", &autoScroll_);
 				ImGui::EndPopup();
 			}
 
@@ -32,7 +34,7 @@ namespace Sane
 			ImGui::SameLine();
 			bool copy = ImGui::Button("Copy");
 			ImGui::SameLine();
-			filter.Draw("Filter", -100.0f);
+			filter_.Draw("Filter", -100.0f);
 
 			ImGui::Separator();
 			ImGui::BeginChild("scrolling", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
@@ -44,28 +46,28 @@ namespace Sane
 				ImGui::LogToClipboard();
 
 			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-			const char* buf = buffer.begin();
-			const char* buf_end = buffer.end();
-			if (filter.IsActive())
+			const char* buf = buffer_.begin();
+			const char* buf_end = buffer_.end();
+			if (filter_.IsActive())
 			{
-				for (int line_no = 0; line_no < lineOffsets.Size; line_no++)
+				for (int line_no = 0; line_no < lineOffsets_.Size; line_no++)
 				{
-					const char* line_start = buf + lineOffsets[line_no];
-					const char* line_end = (line_no + 1 < lineOffsets.Size) ? (buf + lineOffsets[line_no + 1] - 1) : buf_end;
-					if (filter.PassFilter(line_start, line_end))
+					const char* line_start = buf + lineOffsets_[line_no];
+					const char* line_end = (line_no + 1 < lineOffsets_.Size) ? (buf + lineOffsets_[line_no + 1] - 1) : buf_end;
+					if (filter_.PassFilter(line_start, line_end))
 						ImGui::TextUnformatted(line_start, line_end);
 				}
 			}
 			else
 			{
 				ImGuiListClipper clipper;
-				clipper.Begin(lineOffsets.Size);
+				clipper.Begin(lineOffsets_.Size);
 				while (clipper.Step())
 				{
 					for (int line_no = clipper.DisplayStart; line_no < clipper.DisplayEnd; line_no++)
 					{
-						const char* line_start = buf + lineOffsets[line_no];
-						const char* line_end = (line_no + 1 < lineOffsets.Size) ? (buf + lineOffsets[line_no + 1] - 1) : buf_end;
+						const char* line_start = buf + lineOffsets_[line_no];
+						const char* line_end = (line_no + 1 < lineOffsets_.Size) ? (buf + lineOffsets_[line_no + 1] - 1) : buf_end;
 
 						switch (line_start[1])
 						{
@@ -93,7 +95,7 @@ namespace Sane
 			}
 			ImGui::PopStyleVar();
 
-			if (autoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+			if (autoScroll_ && ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
 				ImGui::SetScrollHereY(1.0f);
 
 			ImGui::EndChild();
@@ -121,6 +123,26 @@ namespace Sane
 		void Log::flush_()
 		{
 		}
+
+		void Log::Clear()
+		{
+			buffer_.clear();
+			lineOffsets_.clear();
+			lineOffsets_.push_back(0);
+		}
+
+		void Log::AddLog(const char* fmt, ...)
+		{
+			int old_size = buffer_.size();
+			va_list args;
+			va_start(args, fmt);
+			buffer_.appendfv(fmt, args);
+			va_end(args);
+			for (int new_size = buffer_.size(); old_size < new_size; old_size++)
+				if (buffer_[old_size] == '\n')
+					lineOffsets_.push_back(old_size + 1);
+		}
+
 
 	}
 }

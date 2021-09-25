@@ -1,9 +1,11 @@
-#include <sane/graphics/texture.hpp>
+#include "sane/graphics/texture.hpp"
 
-#include <sane/debugging/logging.hpp>
+#include <glad/gl.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+
+#include "sane/logging/log.hpp"
 
 namespace Sane
 {
@@ -57,7 +59,7 @@ namespace Sane
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    GLuint Texture::GetTextureId()
+    uint32_t Texture::GetTextureId()
     {
         return texture;
     }

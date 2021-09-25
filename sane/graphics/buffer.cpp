@@ -1,34 +1,36 @@
 #include "sane/graphics/buffer.hpp"
 
-#include <sane/debugging/logging.hpp>
+#include <glad/gl.h>
+
+#include "sane/logging/log.hpp"
 
 namespace Sane
 {
-  Buffer::Buffer(GLenum target) : target(target)
+  Buffer::Buffer(int32_t target) : target_(target)
   {
-    glGenBuffers(1, &buffer);
-    SANE_INFO("Successfully created buffer of type: {0}", target);
+    glGenBuffers(1, &buffer_);
+    SANE_INFO("Created {} buffer: {}", target_, buffer_);
   }
 
   Buffer::~Buffer()
   {
-    glDeleteBuffers(1, &buffer);
+    glDeleteBuffers(1, &buffer_);
+    SANE_INFO("Destroyed {} buffer: {}", target_, buffer_);
   }
 
   void Buffer::Bind()
   {
-    glBindBuffer(target, buffer);
+    glBindBuffer(target_, buffer_);
   }
 
   void Buffer::Unbind()
   {
-    glBindBuffer(target, 0);
+    glBindBuffer(target_, 0);
   }
 
-  void Buffer::BufferData(GLsizeiptr size, const void* data, GLenum usage)
+  void Buffer::BufferData(int64_t size, const void* data, int32_t usage)
   {
-    glBindBuffer(target, buffer);
-    glBufferData(target, size, data, usage);
-    // SANE_INFO("Buffered data for buffer: {0}", buffer);
+    glBindBuffer(target_, buffer_);
+    glBufferData(target_, size, data, usage);
   }
 }

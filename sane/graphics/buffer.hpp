@@ -1,25 +1,23 @@
 #pragma once
 
-#include <glad/gl.h>
-
-#include "sane/utils/noncopyable.hpp"
+#include <cstdint>
 
 namespace Sane
 {
-  class Buffer : public NonCopyable
+  class Buffer
   {
   public:
-    Buffer(GLenum target);
+    Buffer(int32_t target);
     ~Buffer();
 
     void Bind();
     void Unbind();
-    void BufferData(GLsizeiptr size, const void* data, GLenum usage);
+    void BufferData(int64_t size, const void* data, int32_t usage);
 
-    operator GLuint() { return buffer; }
+    operator uint32_t() { return buffer_; }
 
   private:
-    GLuint buffer;
-    GLenum target;
+    uint32_t buffer_;
+    int32_t target_;
   };
 }

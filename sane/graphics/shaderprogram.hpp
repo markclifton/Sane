@@ -1,12 +1,10 @@
 #pragma once
 
-#include <glad/gl.h>
-
-#include "sane/utils/noncopyable.hpp"
+#include <cstdint>
 
 namespace Sane
 {
-  class ShaderProgram : public NonCopyable
+  class ShaderProgram
   {
   public:
     ShaderProgram(const char* VS_Contents, const char* FS_Contents);
@@ -15,33 +13,32 @@ namespace Sane
     void Bind();
     void Unbind();
 
-    const GLuint GetUniformLocaition(const char* name);
-    const GLuint GetAttribLocation(const char* name);
+    const uint32_t GetUniformLocaition(const char* name);
+    const uint32_t GetAttribLocation(const char* name);
 
-    operator GLuint() { return program; }
+    operator uint32_t() { return program_; }
 
   private:
-    GLuint program;
-    GLuint vertex_shader;
-    GLuint fragment_shader;
+    uint32_t program_;
+    uint32_t vertex_shader_;
+    uint32_t fragment_shader_;
   };
 
   class VertexAttrib
   {
   public:
-    VertexAttrib(GLint location, GLint size, GLenum type, GLboolean normalized,
-      GLsizei stride, const void* pointer);
+    VertexAttrib(int32_t location, int32_t size, int32_t type, bool normalized, int32_t stride, const void* pointer);
     ~VertexAttrib();
 
     void Enable();
     void Disable();
 
   private:
-    GLint location;
-    GLint size;
-    GLenum type;
-    GLboolean normalized;
-    GLsizei stride;
+    int32_t location;
+    int32_t size;
+    uint32_t type;
+    bool normalized;
+    int32_t stride;
     const void* pointer;
   };
 }

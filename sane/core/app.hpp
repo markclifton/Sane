@@ -1,8 +1,7 @@
 #pragma once
 
-#include <sane/core/layer.hpp>
-#include <sane/core/event.hpp>
-#include <sane/debugging/logging.hpp>
+#include "sane/events/event.hpp"
+#include "sane/layers/layer.hpp"
 
 namespace Sane
 {
@@ -14,8 +13,9 @@ namespace Sane
         virtual void Run() = 0;
 
     protected:
-        Sane::LayerStack layers;
-        Sane::EventQueue& evt_queue;
+        Sane::LayerStack layers_;
+        Sane::LayerStack overlay_layers_;
+        Sane::Events::Queue& evt_queue_;
     };
 
     App* CreateApp();
