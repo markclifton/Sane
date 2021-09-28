@@ -7,7 +7,7 @@
 namespace Sane
 {
     Framebuffer::Framebuffer(int32_t width, int32_t height)
-        : size_({ width, height })
+        : size_(width, height)
     {
         Invalidate();
         SANE_INFO("Created framebuffer: {}", framebuffer_);
@@ -41,13 +41,13 @@ namespace Sane
         glGenTextures(2, attachments_);
 
         glBindTexture(GL_TEXTURE_2D, attachments_[0]);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, static_cast<int32_t>(size_.x), static_cast<int32_t>(size_.y), 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size_.x, size_.y, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, attachments_[0], 0);
 
         glBindTexture(GL_TEXTURE_2D, attachments_[1]);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, static_cast<int32_t>(size_.x), static_cast<int32_t>(size_.y), 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, size_.x, size_.y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, attachments_[1], 0);
@@ -77,7 +77,7 @@ namespace Sane
         return attachments_[index];
     }
 
-    const glm::vec2 Framebuffer::GetSize()
+    const Math::Vec2i Framebuffer::GetSize()
     {
         return size_;
     }

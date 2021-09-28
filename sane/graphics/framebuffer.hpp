@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include <glm/glm.hpp>
+#include "sane/math/vector.hpp"
 
 namespace Sane
 {
@@ -18,10 +18,10 @@ namespace Sane
         void Clear();
 
         uint32_t GetAttachment(uint32_t index);
-        const glm::vec2 GetSize();
+        const Math::Vec2i GetSize();
 
     private:
-        glm::vec2 size_{ 0, 0 };
+        Math::Vec2i size_{ 0, 0 };
         uint32_t framebuffer_{ 0 };
         uint32_t attachments_[2]{ 0,0 };
     };

@@ -9,7 +9,7 @@ namespace Sane
     {
     }
 
-    void FpsCounter::Render()
+    void FpsCounter::Update()
     {
         if (ImGui::Begin("Framerate"))
         {

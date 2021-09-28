@@ -8,6 +8,6 @@ namespace Sane
     {
     public:
         FpsCounter();
-        virtual void Render() override;
+        virtual void Update() override;
     };
 }

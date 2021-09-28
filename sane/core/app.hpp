@@ -2,8 +2,13 @@
 
 #include "sane/core/display.hpp"
 #include "sane/events/event.hpp"
+#include "sane/graphics/buffer.hpp"
+#include "sane/graphics/framebuffer.hpp"
+#include "sane/graphics/shaderprogram.hpp"
 #include "sane/layers/base.hpp"
 #include "sane/layers/imgui.hpp"
+
+#include <iostream>
 
 namespace Sane
 {
@@ -13,6 +18,15 @@ namespace Sane
         App(const char* name);
         virtual ~App() = default;
         void Run();
+
+        void PrintLayers()
+        {
+            for (auto& layer : layers_)
+            {
+                std::cout << layer->Name() << " ";
+            }
+            std::cout << "\n";
+        }
 
         void PushLayer(Layer* layer);
         void PushOverlay(Layer* layer);
@@ -27,7 +41,18 @@ namespace Sane
         Layers::Stack layers_;
 
         Display display_;
-        ImguiIntegration imgui_;
+        ImguiBeginLayer imguiBegin_;
+        ImguiEndLayer imguiEnd_;
+
+        //TEST CODE
+        ShaderProgram sProg;
+        Buffer vbo;
+        Buffer ibo;
+        VertexAttrib vPos;
+        VertexAttrib vCol;
+
+    public:
+        Framebuffer framebuffer;
     };
 
     App* CreateApp();

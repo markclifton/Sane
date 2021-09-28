@@ -14,26 +14,12 @@ namespace Sane
             int32_t mods;
         };
 
-
         class KeyHandler : public Events::Dispatcher
         {
         private:
-            static KeyHandler& Instance()
-            {
-                static KeyHandler handler;
-                return handler;
-            }
+            static KeyHandler& Instance();
         public:
-            static void Process(int key, int scancode, int action, int mods)
-            {
-                KeyEvent ke{ key, scancode, action, mods };
-                Event e;
-                e.action = kKeyEvent;
-                e.detailedAction = action;
-                e.data = &ke;
-                e.size = sizeof(ke);
-                Instance().SubmitEvent(e);
-            }
+            static void Process(int key, int scancode, int action, int mods);
         };
     }
 }

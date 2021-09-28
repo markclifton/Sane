@@ -9,17 +9,13 @@
 
 namespace Sane
 {
-    class ImguiIntegration : public Layer
+    class ImguiBeginLayer : public Layer
     {
         Sane::Display* display_;
     public:
-        ImguiIntegration(Sane::Display* display)
-            : Layer("ImguiIntegration")
+        ImguiBeginLayer(Sane::Display* display)
+            : Layer("ImguiBeginLayer")
             , display_(display)
-        {
-        }
-
-        ~ImguiIntegration()
         {
         }
 
@@ -41,7 +37,7 @@ namespace Sane
             ImGui::DestroyContext();
         }
 
-        void Begin()
+        virtual void Update() override
         {
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
@@ -49,8 +45,19 @@ namespace Sane
 
             ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
         }
+    };
 
-        void End()
+    class ImguiEndLayer : public Layer
+    {
+        Sane::Display* display_;
+    public:
+        ImguiEndLayer(Sane::Display* display)
+            : Layer("ImguiEndLayer")
+            , display_(display)
+        {
+        }
+
+        virtual void Update() override
         {
             ImGui::Render();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

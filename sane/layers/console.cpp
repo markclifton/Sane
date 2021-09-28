@@ -4,11 +4,12 @@ namespace Sane
 {
     Console::Console()
         : Layer("Console")
+        , sink_(Logging::GetSink())
     {
     }
 
-    void Console::Render()
+    void Console::Update()
     {
-        logSink_->Render();
+        sink_->Render();
     }
 }

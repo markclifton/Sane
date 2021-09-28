@@ -9,9 +9,9 @@ namespace Sane
     {
     public:
         Console();
-        virtual void Render() override;
+        virtual void Update() override;
 
     private:
-        const Logging::LogSink logSink_{ Logging::GetLogSink() };
+        const Logging::Sink sink_;
     };
 }
