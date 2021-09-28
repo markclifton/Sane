@@ -119,6 +119,7 @@ namespace Sane
             framebuffer.Unbind();
 
             framebuffer.Bind();
+            if (0)
             {
                 int width = framebuffer.GetSize().x;
                 int height = framebuffer.GetSize().y;
