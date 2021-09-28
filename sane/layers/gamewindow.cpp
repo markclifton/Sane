@@ -8,24 +8,24 @@
 #include <glm/glm.hpp>
 
 #include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 
 namespace Sane
 {
     GameWindow::GameWindow(uint32_t framebufferId)
         : Sane::Layer("GameWindow")
-        , frameSize(1280, 720)
+        , frameSize(400, 400)
         , framebufferId(framebufferId)
     {}
 
     void GameWindow::Update()
     {
-        frameSize = ImGui::GetWindowSize();
-
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0.f, 0.f });
         ImGui::Begin("GameWindow");
         {
             ImGui::BeginChild("GameRender");
-            ImGui::Image((void*)(intptr_t)framebufferId, frameSize, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+            ImGui::Image(reinterpret_cast<ImTextureID>(framebufferId), ImGui::GetWindowSize(), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
             ImGui::EndChild();
         }
         ImGui::End();

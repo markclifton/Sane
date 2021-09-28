@@ -7,6 +7,7 @@
 #include "sane/graphics/shaderprogram.hpp"
 #include "sane/layers/base.hpp"
 #include "sane/layers/imgui.hpp"
+#include "sane/layers/gamewindow.hpp"
 
 #include <iostream>
 
@@ -21,11 +22,11 @@ namespace Sane
 
         void PrintLayers()
         {
+            SANE_INFO("Printing layers: ");
             for (auto& layer : layers_)
             {
-                std::cout << layer->Name() << " ";
+                SANE_INFO("\t{} ", layer->Name());
             }
-            std::cout << "\n";
         }
 
         void PushLayer(Layer* layer);
@@ -51,7 +52,7 @@ namespace Sane
         VertexAttrib vPos;
         VertexAttrib vCol;
 
-    public:
+    protected:
         Framebuffer framebuffer;
     };
 

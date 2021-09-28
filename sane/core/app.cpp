@@ -8,9 +8,6 @@
 
 #include "sane/logging/log.hpp"
 
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include <stb_image_write.h>
-
 namespace
 {
     static const char* vs_modern = R""(
@@ -59,9 +56,9 @@ namespace Sane
         , sProg(vs_modern, fs_modern)
         , vbo(GL_ARRAY_BUFFER)
         , ibo(GL_ELEMENT_ARRAY_BUFFER)
-        , framebuffer(WIDTH, HEIGHT)
         , vPos(sProg.GetAttribLocation("vPos"), 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0)
         , vCol(sProg.GetAttribLocation("vCol"), 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)))
+        , framebuffer(WIDTH, HEIGHT)
     {
 #if defined(WIN32)
         FreeConsole();
@@ -75,6 +72,7 @@ namespace Sane
     {
         while (display_.IsRunning())
         {
+
             framebuffer.Bind();
             framebuffer.Clear();
             {
@@ -115,24 +113,6 @@ namespace Sane
                         sProg.Unbind();
                     }
                 }
-            }
-            framebuffer.Unbind();
-
-            framebuffer.Bind();
-            if (0)
-            {
-                int width = framebuffer.GetSize().x;
-                int height = framebuffer.GetSize().y;
-                GLsizei nrChannels = 3;
-                GLsizei stride = nrChannels * width;
-                stride += (stride % 4) ? (4 - stride % 4) : 0;
-                GLsizei bufferSize = stride * height;
-                std::vector<char> buffer(bufferSize);
-                glPixelStorei(GL_PACK_ALIGNMENT, 4);
-                glReadBuffer(GL_FRONT);
-                glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, buffer.data());
-                stbi_flip_vertically_on_write(true);
-                stbi_write_png("C:/temp/test.png", width, height, nrChannels, buffer.data(), stride);
             }
             framebuffer.Unbind();
 

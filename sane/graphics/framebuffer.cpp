@@ -58,7 +58,7 @@ namespace Sane
     void Framebuffer::Bind()
     {
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_);
-        glViewport(0, 0, static_cast<int32_t>(size_.x), static_cast<int32_t>(size_.y));
+        glViewport(0, 0, size_.x, size_.y);
     }
 
     void Framebuffer::Unbind()

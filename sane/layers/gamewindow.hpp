@@ -1,8 +1,5 @@
 #pragma once
 
-#include "imgui.h"
-
-#include "sane/graphics/framebuffer.hpp"
 #include "sane/layers/base.hpp"
 #include "sane/math/vector.hpp"
 
