@@ -73,7 +73,7 @@ namespace Sane
 					switch (line_start[1])
 					{
 					case 'D':
-						ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(.2, .3, .8, 1));
+						ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(.2f, .3f, .8f, 1.f));
 						break;
 					case 'I':
 						ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0, 1, 0, 1));
@@ -103,20 +103,35 @@ namespace Sane
 		ImGui::End();
 	}
 
+	namespace {
+#pragma warning(disable : 4996)
+		std::string format_time_point(std::chrono::system_clock::time_point point)
+		{
+			std::string out(29, '0');
+			char* buf = &out[0];
+			std::time_t now_c = std::chrono::system_clock::to_time_t(point);
+			std::strftime(buf, 21, "%Y-%m-%d %H:%M:%S.", std::localtime(&now_c));
+			sprintf_s(buf + 20, 10, "%09ld", size_t(point.time_since_epoch().count() % 1000000000));
+			return out;
+		}
+	}
+
 	void Log::sink_it_(const spdlog::details::log_msg& msg)
 	{
+		auto time = format_time_point(msg.time);
+
 		switch (msg.level) {
 		case spdlog::level::debug:
-			AddLog("[DEBUG] :: %s\n", std::string(msg.payload.data(), msg.payload.size()).c_str());
+			AddLog("[DEBUG] %s :: %s\n", time.c_str(), std::string(msg.payload.data(), msg.payload.size()).c_str());
 			break;
 		case spdlog::level::warn:
-			AddLog("[WARN]  :: %s\n", std::string(msg.payload.data(), msg.payload.size()).c_str());
+			AddLog("[WARN]  %s :: %s\n", time.c_str(), std::string(msg.payload.data(), msg.payload.size()).c_str());
 			break;
 		case spdlog::level::err:
-			AddLog("[FATAL] :: %s\n", std::string(msg.payload.data(), msg.payload.size()).c_str());
+			AddLog("[FATAL] %s :: %s\n", time.c_str(), std::string(msg.payload.data(), msg.payload.size()).c_str());
 			break;
 		default:
-			AddLog("[INFO]  :: %s\n", std::string(msg.payload.data(), msg.payload.size()).c_str());
+			AddLog("[INFO]  %s :: %s\n", time.c_str(), std::string(msg.payload.data(), msg.payload.size()).c_str());
 			break;
 		}
 	}
