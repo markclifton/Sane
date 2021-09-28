@@ -7,7 +7,7 @@
 #include <glm/ext.hpp>
 #include <glm/glm.hpp>
 
-#include "sane/events/event.hpp"
+#include "sane/events/dispatcher.hpp"
 
 namespace Sane
 {

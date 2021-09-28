@@ -1,14 +1,10 @@
-#include "sane/layers/base.hpp"
+#include "sane/layers/stack.hpp"
 
+#include "sane/layers/layer.hpp"
 #include "sane/logging/log.hpp"
 
 namespace Sane
 {
-    Layer::Layer(const std::string& name)
-        : name(name)
-    {
-    }
-
     namespace Layers
     {
         void Stack::PushLayer(Layer* layer)

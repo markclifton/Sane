@@ -3,9 +3,9 @@
 #include <vector>
 #include <mutex>
 
-#include <imgui.h>
-#include <spdlog/spdlog.h>
-#include <spdlog/sinks/base_sink.h>
+#include "imgui.h"
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/base_sink.h"
 
 #define SANE_DEBUG spdlog::debug
 #define SANE_INFO spdlog::info

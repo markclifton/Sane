@@ -1,5 +1,7 @@
 #include "sane/input/keyHandler.hpp"
 
+#include "sane/events/events.hpp"
+
 namespace Sane
 {
     namespace Input

@@ -1,5 +1,7 @@
 #include "sane/input/mouseHandler.hpp"
 
+#include "sane/events/events.hpp"
+
 namespace Sane
 {
     namespace Input

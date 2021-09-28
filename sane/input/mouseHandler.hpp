@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sane/events/events.hpp"
+#include "sane/events/dispatcher.hpp"
 
 namespace Sane
 {

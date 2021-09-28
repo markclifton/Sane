@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sane/layers/base.hpp"
+#include "sane/layers/layer.hpp"
 
 namespace Sane
 {

@@ -5,7 +5,7 @@
 #include "imgui_impl_opengl3.h"
 
 #include "sane/core/display.hpp"
-#include "sane/layers/base.hpp"
+#include "sane/layers/layer.hpp"
 
 namespace Sane
 {
