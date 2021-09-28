@@ -31,6 +31,6 @@ namespace Sane
   void Buffer::BufferData(int64_t size, const void* data, int32_t usage)
   {
     glBindBuffer(target_, buffer_);
-    glBufferData(target_, size, data, usage);
+    glBufferData(target_, (size_t)size, data, usage);
   }
 }
