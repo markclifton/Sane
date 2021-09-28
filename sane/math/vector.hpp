@@ -7,6 +7,9 @@ namespace Sane
 {
     namespace Math
     {
+        typedef glm::vec2 Vec2f;
+        typedef glm::vec3 Vec3f;
+
         struct Vec2i
         {
             Vec2i(int32_t x, int32_t y)

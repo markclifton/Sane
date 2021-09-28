@@ -1,6 +1,10 @@
 #pragma once
 
+#include <entt/entt.hpp>
+#include <vector>
+
 #include "sane/core/display.hpp"
+#include "sane/ecs/systems/system.hpp"
 #include "sane/events/queue.hpp"
 #include "sane/graphics/framebuffer.hpp"
 #include "sane/layers/stack.hpp"
@@ -23,13 +27,18 @@ namespace Sane
         void PopLayer(Layer* layer);
         void PopOverlay(Layer* layer);
 
+        entt::registry& Registry() { return registry_; }
+        void PushSystem(Systems::System* system) { systems_.push_back(system); }
     private:
+        entt::registry registry_;
         Events::Queue& evt_queue_;
         Layers::Stack layers_;
 
         Display display_;
         ImguiBeginLayer imguiBegin_;
         ImguiEndLayer imguiEnd_;
+
+        std::vector<Systems::System*> systems_;
 
     protected:
         Framebuffer framebuffer;

@@ -5,10 +5,11 @@
 
 namespace Sane
 {
-    enum EventsType
+    const enum EventsType
     {
+        kNoEvent = 0,
         kKeyEvent = 1,
-        kMouseEvent,
-        kMouseMoveEvent
+        kMouseEvent = 2,
+        kMouseMoveEvent = 3
     };
 }

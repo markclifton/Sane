@@ -8,6 +8,9 @@
 
 #include "sane/logging/log.hpp"
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb_image_write.h>
+
 namespace Sane
 {
     App::App(const char* name)
@@ -29,9 +32,12 @@ namespace Sane
     {
         while (display_.IsRunning())
         {
-
             framebuffer.Bind();
             framebuffer.Clear();
+            for (auto& system : systems_)
+            {
+                system->Update(0);
+            }
             framebuffer.Unbind();
 
             for (Layer* layer : layers_)
