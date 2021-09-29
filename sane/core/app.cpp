@@ -30,6 +30,7 @@ namespace Sane
 
     void App::Run()
     {
+        int completed = 0;;
         while (display_.IsRunning())
         {
             framebuffer.Bind();

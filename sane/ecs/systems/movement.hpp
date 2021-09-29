@@ -1,13 +1,12 @@
 #pragma once
 
 #include "sane/ecs/systems/system.hpp"
-#include "sane/events/listener.hpp"
-#include "sane/events/inputs.hpp"
-#include "sane/logging/log.hpp"
-#include "sane/ecs/components/position.hpp"
-#include "sane/ecs/components/translation.hpp"
 #include "sane/ecs/components/player.hpp"
+#include "sane/ecs/components/translation.hpp"
 #include "sane/events/events.hpp"
+#include "sane/events/inputs.hpp"
+#include "sane/events/listener.hpp"
+#include "sane/logging/log.hpp"
 
 namespace Sane
 {
@@ -37,18 +36,15 @@ namespace Sane
 
                     switch (keyEvent.key)
                     {
-                    case GLFW_KEY_W:
-                        y += speed;
-                        return true;
-                    case GLFW_KEY_S:
-                        y -= speed;
-                        return true;
                     case GLFW_KEY_A:
                         x -= speed;
                         return true;
                     case GLFW_KEY_D:
                         x += speed;
                         return true;
+                    case GLFW_KEY_SPACE:
+                        if (speed > 0)
+                            y = .1f;
                     default:
                         return false;
                     }
@@ -58,10 +54,13 @@ namespace Sane
 
             virtual void Update(uint64_t ts) override
             {
-                auto view = registry_.view<Components::Player, Components::Position, Components::Translation>();
-                for (auto [entity, player, pos, trans] : view.each()) {
-                    pos = { pos.x + x, pos.y + y, pos.z };
-                }
+                auto view = registry_.view<Components::Player, Components::Translation>();
+                view.each([&](const auto entity, const auto& player, auto& t) {
+                    t.y += y;
+                    t.x += x;
+                    y = 0;
+                    x = 0;
+                    });
             }
 
         };
