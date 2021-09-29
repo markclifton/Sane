@@ -13,3 +13,6 @@
 [submodule "deps/spdlog"]
 	path = deps/spdlog
 	url = https://github.com/gabime/spdlog.git
+[submodule "deps/reactphysics3d"]
+	path = deps/reactphysics3d
+	url = https://github.com/DanielChappuis/reactphysics3d.git
