@@ -7,9 +7,10 @@
 #include "sane/ecs/systems/system.hpp"
 #include "sane/events/queue.hpp"
 #include "sane/graphics/framebuffer.hpp"
-#include "sane/layers/stack.hpp"
-#include "sane/layers/imgui.hpp"
+#include "sane/layers/console.hpp"
 #include "sane/layers/gamewindow.hpp"
+#include "sane/layers/imgui.hpp"
+#include "sane/layers/stack.hpp"
 
 namespace Sane
 {
@@ -29,7 +30,18 @@ namespace Sane
 
         entt::registry& Registry() { return registry_; }
         void PushSystem(Systems::System* system) { systems_.push_back(system); }
+
+        void DisplayConsole(bool Enable)
+        {
+            if (Enable)
+                PushOverlay(&console);
+            else
+                PopOverlay(&console);
+        }
+
     private:
+        Console console;
+
         entt::registry registry_;
         Events::Queue& evt_queue_;
         Layers::Stack layers_;
