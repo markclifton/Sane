@@ -16,8 +16,6 @@ namespace Sane
 {
     class App
     {
-        const int32_t WIDTH = 1280;
-        const int32_t HEIGHT = 720;
     public:
         App(const char* name);
         virtual ~App() = default;

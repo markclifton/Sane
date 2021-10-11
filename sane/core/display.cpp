@@ -4,7 +4,6 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-#include "sane/events/inputs.hpp"
 #include "sane/logging/log.hpp"
 
 namespace
@@ -22,6 +21,20 @@ namespace
   void mouse_forwarder(GLFWwindow* window, int button, int action, int mods)
   {
     Sane::Input::MouseHandler::Process(button, action, mods);
+  }
+
+  void window_size_callback(GLFWwindow* window, int width, int height)
+  {
+    Sane::Display* display = static_cast<Sane::Display*>(glfwGetWindowUserPointer(window));
+    Sane::DisplayResizeEvent dre{ width, height };
+
+    Sane::Event e;
+    e.action = Sane::kDisplayResizeEvent;
+    e.detailedAction = 0;
+    e.data = &dre;
+    e.size = sizeof(dre);
+
+    display->SubmitEvent(e);
   }
 
   static void error_callback(int error, const char* description) {
@@ -48,10 +61,13 @@ namespace Sane
       exit(EXIT_FAILURE);
     }
 
+    glfwSetWindowUserPointer(*this, this);
+
     glfwSetErrorCallback(error_callback);
     glfwSetKeyCallback(window_, key_forwarder);
     glfwSetCursorPosCallback(window_, cursor_forwarder);
     glfwSetMouseButtonCallback(window_, mouse_forwarder);
+    glfwSetWindowSizeCallback(window_, window_size_callback);
 
     glfwMakeContextCurrent(window_);
     gladLoadGL(glfwGetProcAddress);

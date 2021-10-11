@@ -1,16 +1,7 @@
 #pragma once
 
-#include <glad/gl.h>
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-
-#include <glm/ext.hpp>
-#include <glm/glm.hpp>
-
-#include "sane/ecs/components/position.hpp"
-#include "sane/ecs/systems/system.hpp"
-#include "sane/graphics/buffer.hpp"
-#include "sane/graphics/shaderprogram.hpp"
+#include "sane/ecs/common.hpp"
+#include "sane/graphics/common.hpp"
 
 namespace Sane
 {

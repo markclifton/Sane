@@ -7,7 +7,7 @@
 #include <glm/ext.hpp>
 #include <glm/glm.hpp>
 
-#include "sane/events/dispatcher.hpp"
+#include "sane/events/common.hpp"
 
 namespace Sane
 {
@@ -24,6 +24,8 @@ namespace Sane
     glm::mat4 GetPersProjection();
 
     operator GLFWwindow* () { return window_; }
+
+    friend void resize_forwarder(GLFWwindow* window, int width, int height);
 
   private:
     GLFWwindow* window_;

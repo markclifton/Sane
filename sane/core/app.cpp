@@ -11,6 +11,11 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
 
+#include "sane/model/model.hpp"
+
+const int32_t WIDTH = 1280;
+const int32_t HEIGHT = 720;
+
 namespace Sane
 {
     App::App(const char* name)
@@ -30,11 +35,15 @@ namespace Sane
 
     void App::Run()
     {
+        Model model("models/cube.obj");
+
         int completed = 0;;
         while (display_.IsRunning())
         {
             framebuffer.Bind();
             framebuffer.Clear();
+            model.DrawImmediate();
+
             for (auto& system : systems_)
             {
                 system->Update(0);

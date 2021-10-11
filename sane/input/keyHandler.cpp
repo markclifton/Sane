@@ -1,6 +1,6 @@
 #include "sane/input/keyHandler.hpp"
 
-#include "sane/events/events.hpp"
+#include "sane/events/common.hpp"
 
 namespace Sane
 {
