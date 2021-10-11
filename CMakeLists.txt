@@ -5,11 +5,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(BuildDir ${CMAKE_SOURCE_DIR}/build)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BuildDir}/${CMAKE_BUILD_TYPE})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${BuildDir}/${CMAKE_BUILD_TYPE})
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${BuildDir}/${CMAKE_BUILD_TYPE})
-
 add_subdirectory(${PROJECT_SOURCE_DIR}/deps/glad)
 add_subdirectory(${PROJECT_SOURCE_DIR}/deps/glfw)
 add_subdirectory(${PROJECT_SOURCE_DIR}/deps/glm)
@@ -50,7 +45,7 @@ if (${APPLE})
     imgui
     EnTT::EnTT
     stb_image
-    SIMD_MOC
+    simd_moc
     spdlog::spdlog
     )
     
@@ -64,7 +59,7 @@ else()
         OpenGL::GL
         EnTT::EnTT
         stb_image
-        SIMD_MOC
+        simd_moc
         spdlog::spdlog
     )
 

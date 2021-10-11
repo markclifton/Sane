@@ -109,8 +109,8 @@ namespace Sane
 		{
 			std::string out(29, '0');
 			char* buf = &out[0];
-			std::time_t now_c = std::chrono::system_clock::to_time_t(point);
-			std::strftime(buf, 21, "%Y-%m-%d %H:%M:%S.", std::localtime(&now_c));
+			time_t now_c = std::chrono::system_clock::to_time_t(point);
+			strftime(buf, 21, "%Y-%m-%d %H:%M:%S.", localtime(&now_c));
 			sprintf_s(buf + 20, 10, "%09ld", size_t(point.time_since_epoch().count() % 1000000000));
 			return out;
 		}
