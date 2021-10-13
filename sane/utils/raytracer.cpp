@@ -1,7 +1,5 @@
 #include "sane/utils/raytracer.hpp"
 
-namespace Sane
-{
 #include <cmath>
 #include <limits>
 #include <xmmintrin.h>
@@ -9,7 +7,11 @@ namespace Sane
 
 #include "sane/graphics/common.hpp"
 #include "sane/logging/log.hpp"
+#include "sane/model/model.hpp"
+#include "sane/utils/aabb.hpp"
 
+namespace Sane
+{
     Vec3Packed::Vec3Packed() {}
     Vec3Packed::~Vec3Packed() {}
 
@@ -114,10 +116,7 @@ namespace Sane
         __m128 det = v0v1.dotProduct(pvec);
 
         __m128 detMask = _mm_cmplt_ps(_mm_andnot_ps(maskFloatSign, det), zerosE);
-        if (_mm_movemask_ps(detMask) == 0xff)
-        {
-            return false;
-        }
+        if (_mm_movemask_ps(detMask) == 0xff) return false;
 
         maskValid = _mm_andnot_ps(detMask, ones);
 
@@ -129,10 +128,7 @@ namespace Sane
         __m128 maskA = _mm_cmplt_ps(uPack, zeros);
         __m128 maskB = _mm_cmpgt_ps(uPack, ones);
         __m128 maskAB = _mm_or_ps(maskA, maskB);
-        if (_mm_movemask_ps(maskAB) == 0xff)
-        {
-            return false;
-        }
+        if (_mm_movemask_ps(maskAB) == 0xff) return false;
 
         maskValid = _mm_andnot_ps(maskAB, maskValid);
 
@@ -142,10 +138,7 @@ namespace Sane
         maskA = _mm_cmplt_ps(vPack, zeros);
         maskB = _mm_cmpgt_ps(_mm_add_ps(uPack, vPack), ones);
         maskAB = _mm_or_ps(maskA, maskB);
-        if (_mm_movemask_ps(maskAB) == 0xff)
-        {
-            return false;
-        }
+        if (_mm_movemask_ps(maskAB) == 0xff) return false;
 
         maskValid = _mm_andnot_ps(maskAB, maskValid);
 
@@ -154,7 +147,7 @@ namespace Sane
         maskA = _mm_cmplt_ps(tPack, zerosE);
         maskValid = _mm_andnot_ps(maskA, maskValid);
 
-        return _mm_movemask_ps(_mm_cmpeq_ps(maskValid, ones)) == 0x00 ? false : true;
+        return _mm_movemask_ps(_mm_cmpeq_ps(maskValid, ones)) != 0x00;
     }
 
     bool intersect(Vec3Packed* VerticesPacked, unsigned int NumberOfVertexPacks, const Ray& ray, float& distance, unsigned int& triangleIndex, float& u, float& v)
@@ -206,4 +199,145 @@ namespace Sane
         }
         return isect;
     }
+
+    float dot(const Vec3& left, const Vec3& right)
+    {
+        return left.x * right.x + left.y * right.y + left.z * right.z;
+    }
+
+    Vec3 cross(const Vec3& left, const Vec3& right)
+    {
+        Vec3 result;
+        result.x = left.y * right.z - left.z * right.y;
+        result.y = left.z * right.x - left.x * right.z;
+        result.z = left.x * right.y - left.y * right.x;
+        return result;
+    }
+
+    int Triangle_intersect(Vec3* value,
+        const double V0x, const double V0y, const double V0z,
+        const double V1x, const double V1y, const double V1z,
+        const double V2x, const double V2y, const double V2z,
+        const Ray& ray)
+    {
+        Vec3 u(0.0, 0.0, 0.0), v(0.0, 0.0, 0.0), n(0.0, 0.0, 0.0);
+        Vec3 dir(0.0, 0.0, 0.0), w0(0.0, 0.0, 0.0), w(0.0, 0.0, 0.0);
+        double r, a, b;
+
+        u = Vec3(V1x - V0x, V1y - V0y, V1z - V0z);
+        v = Vec3(V2x - V0x, V2y - V0y, V2z - V0z);
+        n = cross(u, v);
+
+        if (n.x == 0.0 && n.y == 0.0 && n.z == 0.0)
+            return 1;
+
+        dir = ray.direction;
+
+        w0 = Vec3(ray.origin.x - V0x, ray.origin.y - V0y, ray.origin.z - V0z);
+        a = -dot(n, w0);
+
+        b = dot(n, dir);
+        if (std::abs(b) < 1e-13)
+            return 1;
+
+        r = a / b;
+        if (r < 0.0)
+            return 1;
+
+        Vec3 I(ray.origin.x + (dir.x * r), ray.origin.y + (dir.y * r), ray.origin.z + (dir.z * r));
+
+        double    uu, uv, vv, wu, wv, D;
+        uu = dot(u, u);
+        uv = dot(u, v);
+        vv = dot(v, v);
+
+        w = Vec3(I.x - V0x, I.y - V0y, I.z - V0z);
+        wu = dot(w, u);
+        wv = dot(w, v);
+        D = uv * uv - uu * vv;
+
+        double s, t;
+        s = (uv * wv - vv * wu) / D;
+        if (s < 0.0 || s > 1.0)
+            return 1;
+        t = (uv * wu - uu * wv) / D;
+        if (t < 0.0 || (s + t) > 1.0)
+            return 1;
+
+        value->x = I.x;
+        value->y = I.y;
+        value->z = I.z;
+        return 0;
+    }
+
+    bool intersect2(Model* model, Vec3* value, const Ray& ray)
+    {
+        const AABB aabb_wcs(&model->vertices_[0], model->vertices_.size());
+        const bool aabb_isect = aabb_wcs.intersect(value, ray);
+        const bool aabb_contains = (ray.origin.x >= aabb_wcs.minX && ray.origin.x <= aabb_wcs.maxX &&
+            ray.origin.y >= aabb_wcs.minY && ray.origin.y <= aabb_wcs.maxY &&
+            ray.origin.z >= aabb_wcs.minZ && ray.origin.z <= aabb_wcs.maxZ);
+
+        // screen for AABB intersection
+        if (!aabb_isect && !aabb_contains)
+            return false;
+
+        return intersectGeneric2(model, value, ray);
+    }
+
+    bool intersectGeneric2(Model* model, Vec3* value, const Ray& ray)
+    {
+        std::size_t s = 3u;
+
+        double isectDistSq = NAN;
+        bool haveCandidate = false;
+
+        const std::size_t faceCount = model->indices_.size() / 3;
+        for (std::size_t face = 0; face < faceCount; face++) {
+            Vec3 a = model->vertices_[face * 3 + 0];
+            Vec3 b = model->vertices_[face * 3 + 1];
+            Vec3 c = model->vertices_[face * 3 + 2];
+
+            Vec3 abc[3] = { a, b, c };
+
+            AABB aabb(abc, 3u);
+            Vec3 p;
+            if (!aabb.intersect(&p, ray))
+                continue;
+
+            if (haveCandidate) {
+                const double dx = (p.x - ray.origin.x);
+                const double dy = (p.y - ray.origin.y);
+                const double dz = (p.z - ray.origin.z);
+                const double distSq = (dx * dx) + (dy * dy) + (dz * dz);
+                if (distSq > isectDistSq)
+                    continue;
+            }
+
+            int code = Triangle_intersect(&p,
+                a.x, a.y, a.z,
+                b.x, b.y, b.z,
+                c.x, c.y, c.z,
+                ray);
+            if (code != 0)
+                continue;
+
+            const double dx = (p.x - ray.origin.x);
+            const double dy = (p.y - ray.origin.y);
+            const double dz = (p.z - ray.origin.z);
+            const double distSq = (dx * dx) + (dy * dy) + (dz * dz);
+            if (!haveCandidate || (distSq < isectDistSq)) {
+                *value = p;
+                isectDistSq = distSq;
+                haveCandidate = true;
+            }
+        }
+
+        if (!haveCandidate)
+            return false;
+
+        return true;
+    }
+
+
 }

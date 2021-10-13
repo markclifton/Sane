@@ -10,7 +10,7 @@
 
 namespace Sane
 {
-    typedef Sane::VertexData::Position Vec3;
+    typedef VertexData::Position Vec3;
 
     struct Ray
     {
@@ -59,4 +59,16 @@ namespace Sane
 
     bool intersectTrianglesPacked(const Vec3Packed& scalePack, const Vec3Packed& positionPack, const RayPacked& rayPack, const Vec3Packed& vPack0, const Vec3Packed& vPack1, const Vec3Packed& vPack2, __m128& tPack, __m128& maskValid, __m128& uPack, __m128& vPack);
     bool intersect(Vec3Packed* VerticesPacked, unsigned int NumberOfVertexPacks, const Ray& ray, float& distance, unsigned int& triangleIndex, float& u, float& v);
+
+    float dot(const Vec3& left, const Vec3& right);
+    Vec3 cross(const Vec3& left, const Vec3& right);
+    int Triangle_intersect(Vec3* value,
+        const double V0x, const double V0y, const double V0z,
+        const double V1x, const double V1y, const double V1z,
+        const double V2x, const double V2y, const double V2z,
+        const Ray& ray);
+
+    class Model;
+    bool intersect2(Model* model, Vec3* value, const Ray& ray);
+    bool intersectGeneric2(Model* model, Vec3* value, const Ray& ray);
 }

@@ -18,6 +18,18 @@ namespace Sane
     {
         struct Position
         {
+            Position()
+                : Position(0, 0, 0, 0)
+            {}
+
+            Position(float x, float y, float z, float w)
+                : x(x), y(y), z(z), w(w)
+            {}
+
+            Position(float x, float y, float z)
+                : Position(x, y, z, 1)
+            {}
+
             float x, y, z, w;
         };
 

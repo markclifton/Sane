@@ -3,12 +3,13 @@
 #include <vector>
 
 #include "sane/graphics/common.hpp"
-#include "sane/utils/raytracer.hpp"
-
 #include "sane/events/common.hpp"
+#include "sane/utils/timer.hpp"
 
 namespace Sane
 {
+    struct Vec3Packed;
+
     class Model : public Events::Listener
     {
     public:
@@ -16,7 +17,6 @@ namespace Sane
         virtual bool ProcessEvent(Event& evt) override;
         void DrawImmediate();
 
-    private:
         std::vector<VertexData::Position> vertices_;
         std::vector<VertexData::Normal> normals_;
         std::vector<VertexData::UV> uvs_;
@@ -35,5 +35,13 @@ namespace Sane
         unsigned int numVerticesPacked{ 0 };
 
         float x{ 0 }, y{ 0 };
+
+        Timer timer;
+        Timer timer2;
+        double simdTotal{ 0 };
+        int simdSamples{ 0 };
+
+        double linearTotal{ 0 };
+        int linearSamples{ 0 };
     };
 }

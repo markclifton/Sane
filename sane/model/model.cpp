@@ -4,6 +4,7 @@
 #include <string>
 
 #include "sane/logging/log.hpp"
+#include "sane/utils/raytracer.hpp"
 
 namespace
 {
@@ -27,15 +28,14 @@ namespace
     static const char* vs_modern = R""(
     #version 330
     layout(location = 0) in vec3 vPos;
+    uniform vec4 iColor;
     uniform mat4 MVP;
     out vec4 color;
     void main() {
       gl_Position = MVP * vec4(vPos, 1.0);
-      color = vec4(1, 1, 1, 1);
-      color *= 15.f / (length(gl_Position) * length(gl_Position));
-      color.a = 1.f;
+      color = iColor;
     }
-)"";
+    )"";
 
     static const char* fs_modern = R""(
     #version 330
@@ -44,7 +44,7 @@ namespace
     void main() {
       outColor = color;
     }
-)"";
+    )"";
 }
 
 namespace Sane
@@ -58,6 +58,8 @@ namespace Sane
         , vPos(sProg_.GetAttribLocation("vPos"), 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0)
         , Listener("Model")
     {
+        timer2.reset();
+
         std::vector<VertexData::Position> vertices;
         std::vector<VertexData::Normal> normals;
         std::vector<VertexData::UV> uvs;
@@ -134,6 +136,7 @@ namespace Sane
         else
         {
             SANE_ERROR("Failed to model: {}", path);
+            return;
         }
 
         SANE_INFO("Loaded model: {}", path);
@@ -184,33 +187,41 @@ namespace Sane
 
     void Model::DrawImmediate()
     {
-        static float xC = -1.f;
-        static float yC = -1.f;
-        glBegin(GL_LINES);
-        glVertex3f(0.0f, 0.0f, 0.0f);
-        glVertex3f(50.0f, 50.0f, 50.0f);
-        glEnd();
-
         glm::mat4 m = glm::mat4(1.f);
         glm::mat4 p = glm::perspective(45.0f, 16.f / 9.f, 1.0f, 200.0f);
         glm::mat4 mvp = p * m;
 
-        const Ray ray{ {xC, yC, 0}, {0, 0, -1.f} };
+        glm::vec4 iColor(255, 255, 255, 255);
+
+        const Ray ray{ {0, 0, 0 }, {0, 0, -1.f } };
         float distance = std::numeric_limits<float>::max();
         unsigned int triangleIndex;
         float u;
         float v;
-        bool intersection = intersect(verticesPacked, numVerticesPacked, ray, distance, triangleIndex, u, v);
 
-        if (intersection)
+        timer.reset();
+        bool simdIntersect = false;
+        if (simdIntersect = intersect(verticesPacked, numVerticesPacked, ray, distance, triangleIndex, u, v))
         {
-            SANE_INFO("Intersection: {},{} -- {}, {}, {}, {}", xC, yC, distance, triangleIndex, u, v);
         }
-        xC += .5f;
-        if (xC > 1.f)
+        double simdTime = timer.get();
+        simdSamples++;
+        simdTotal += simdTime;
+
+        Vec3 out;
+        timer.reset();
+        bool linearIntersect = false;
+        if (linearIntersect = intersect2(this, &out, ray))
         {
-            xC = -1.f;
-            yC += .5f;
+        }
+        double linearTime = timer.get();
+        linearSamples++;
+        linearTotal += linearTime;
+
+        if (timer2.get() > 1000)
+        {
+            SANE_INFO("SIMD timing: {} -- Non SIMD timing: {} ({} vs {})", simdTotal / simdSamples, linearTotal / linearSamples, simdIntersect, linearIntersect);
+            timer2.reset();
         }
 
         sProg_.Bind();
@@ -225,6 +236,8 @@ namespace Sane
             indices_buffer.BufferData(sizeof(uint32_t) * indices_.size(), &indices_[0], GL_STATIC_DRAW);
 
         glUniformMatrix4fv(sProg_.GetUniformLocaition("MVP"), 1, GL_FALSE, (const GLfloat*)&mvp[0][0]);
+        glUniform4f(sProg_.GetUniformLocaition("iColor"), iColor.r, iColor.g, iColor.b, iColor.a);
+
         glDrawElements(GL_TRIANGLES, indices_.size(), GL_UNSIGNED_INT, (void*)0);
         indices_buffer.Unbind();
 
