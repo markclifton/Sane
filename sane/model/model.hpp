@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glm/ext.hpp>
+#include <glm/glm.hpp>
 #include <vector>
 
 #include "sane/graphics/common.hpp"
@@ -8,14 +10,12 @@
 
 namespace Sane
 {
-    struct Vec3Packed;
-
     class Model : public Events::Listener
     {
     public:
         Model(const char* path);
         virtual bool ProcessEvent(Event& evt) override;
-        void DrawImmediate();
+        void DrawImmediate(glm::mat4 mvp);
 
         std::vector<VertexData::Position> vertices_;
         std::vector<VertexData::Normal> normals_;
@@ -30,18 +30,5 @@ namespace Sane
         Buffer uvs_buffer;
         Buffer indices_buffer;
         VertexAttrib vPos;
-
-        Vec3Packed* verticesPacked{ nullptr };
-        unsigned int numVerticesPacked{ 0 };
-
-        float x{ 0 }, y{ 0 };
-
-        Timer timer;
-        Timer timer2;
-        double simdTotal{ 0 };
-        int simdSamples{ 0 };
-
-        double linearTotal{ 0 };
-        int linearSamples{ 0 };
     };
 }

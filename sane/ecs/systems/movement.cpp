@@ -1,6 +1,7 @@
 #include "sane/ecs/systems/movement.hpp"
 
 #include "sane/logging/log.hpp"
+#include <GLFW/glfw3.h>
 
 namespace Sane
 {
@@ -17,6 +18,7 @@ namespace Sane
             float speed = .025f;
             if (event.action == kKeyEvent)
             {
+                (void)z;
                 Input::KeyEvent& keyEvent = *(Input::KeyEvent*)event.data;
                 if (keyEvent.action == GLFW_REPEAT)
                     return false;
@@ -28,13 +30,14 @@ namespace Sane
                 {
                 case GLFW_KEY_A:
                     x -= speed;
-                    return true;
+                    return false;
                 case GLFW_KEY_D:
                     x += speed;
-                    return true;
+                    return false;
                 case GLFW_KEY_SPACE:
                     if (speed > 0)
                         y = .1f;
+                    return false;
                 default:
                     return false;
                 }
@@ -44,13 +47,6 @@ namespace Sane
 
         void Movement::Update(uint64_t ts)
         {
-            auto view = registry_.view<Components::Player, Components::Translation>();
-            view.each([&](const auto entity, const auto& player, auto& t) {
-                t.y += y;
-                t.x += x;
-                y = 0;
-                x = 0;
-                });
         }
     }
 }

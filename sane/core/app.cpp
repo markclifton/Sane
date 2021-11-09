@@ -11,7 +11,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
 
-#include "sane/model/model.hpp"
+#include "sane/ecs/common.hpp"
 
 const int32_t WIDTH = 1280;
 const int32_t HEIGHT = 720;
@@ -28,6 +28,7 @@ namespace Sane
 #if defined(WIN32)
         FreeConsole();
 #endif
+
         PushLayer(&evt_queue_);
         layers_.PushImguiIntegration(&imguiBegin_, &imguiEnd_);
         SANE_WARN("Current path is {}", std::filesystem::current_path().string());
@@ -35,14 +36,23 @@ namespace Sane
 
     void App::Run()
     {
-        Model model("models/cube.obj");
+        Systems::Scene scene(Registry());
+        {
+            const auto camera0 = Registry().create();
+            Registry().emplace<Sane::Components::Camera>(camera0, true);
+            Registry().emplace<Sane::Components::Position>(camera0, 2.f, 0.f, 0.f, 0.f);
+            Registry().emplace<Sane::Components::Rotation>(camera0, 0.f, 0.f, 0.f);
+            Registry().emplace<Sane::Components::RenderContext>(camera0, 1920.f, 1080.f);
+        }
 
-        int completed = 0;;
+        Systems::Camera camSystem(Registry());
+        PushSystem(&camSystem);
+        PushSystem(&scene);
+
         while (display_.IsRunning())
         {
             framebuffer.Bind();
             framebuffer.Clear();
-            model.DrawImmediate();
 
             for (auto& system : systems_)
             {

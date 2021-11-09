@@ -7,7 +7,7 @@
 
 namespace Sane
 {
-    const enum EventsType
+    enum EventsType
     {
         kNoEvent = 0,
         kKeyEvent = 1,

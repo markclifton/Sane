@@ -4,7 +4,6 @@
 #include <string>
 
 #include "sane/logging/log.hpp"
-#include "sane/utils/raytracer.hpp"
 
 namespace
 {
@@ -34,6 +33,11 @@ namespace
     void main() {
       gl_Position = MVP * vec4(vPos, 1.0);
       color = iColor;
+
+        vec3 origin = vec3(0,0,0);
+        float test = clamp(distance(gl_Position.xyz, origin), 0, 10) / 10.f;
+
+        color.xyz =  vec3(1 - test, 1 - test, 1 - test);
     }
     )"";
 
@@ -50,16 +54,14 @@ namespace
 namespace Sane
 {
     Model::Model(const char* path)
-        : vertices_buffer(GL_ARRAY_BUFFER)
+        : Listener("Model")
+        , sProg_(vs_modern, fs_modern)
+        , vertices_buffer(GL_ARRAY_BUFFER)
         , normals_buffer(GL_ARRAY_BUFFER)
         , uvs_buffer(GL_ARRAY_BUFFER)
         , indices_buffer(GL_ELEMENT_ARRAY_BUFFER)
-        , sProg_(vs_modern, fs_modern)
         , vPos(sProg_.GetAttribLocation("vPos"), 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0)
-        , Listener("Model")
     {
-        timer2.reset();
-
         std::vector<VertexData::Position> vertices;
         std::vector<VertexData::Normal> normals;
         std::vector<VertexData::UV> uvs;
@@ -138,91 +140,16 @@ namespace Sane
             SANE_ERROR("Failed to model: {}", path);
             return;
         }
-
-        SANE_INFO("Loaded model: {}", path);
-
-        {
-            unsigned int reminder = vertices_.size() % 12;
-            numVerticesPacked = (vertices_.size() + reminder) / 4;
-            verticesPacked = (Vec3Packed*)_aligned_malloc(numVerticesPacked * sizeof(Vec3Packed), 16);
-            unsigned int packIndex = 0;
-            for (unsigned int i = 0; i < vertices_.size() + reminder; i += 12)
-            {
-                auto& v0 = vertices_[i];
-                auto& v1 = vertices_[i + 1];
-                auto& v2 = vertices_[i + 2];
-
-                auto& v3 = vertices_[i + 3];
-                auto& v4 = vertices_[i + 4];
-                auto& v5 = vertices_[i + 5];
-
-                auto& v6 = vertices_[i + 6];
-                auto& v7 = vertices_[i + 7];
-                auto& v8 = vertices_[i + 8];
-
-                auto& v9 = vertices_[i + 9];
-                auto& v10 = vertices_[i + 10];
-                auto& v11 = vertices_[i + 11];
-
-                verticesPacked[packIndex] = Vec3Packed(v0, v3, v6, v9);
-                verticesPacked[packIndex + 1] = Vec3Packed(v1, v4, v7, v10);
-                verticesPacked[packIndex + 2] = Vec3Packed(v2, v5, v8, v11);
-
-                packIndex += 3;
-            }
-        }
     }
 
     bool Model::ProcessEvent(Event& evt)
     {
-        if (evt.action == kMouseMoveEvent)
-        {
-            Input::MouseMoveEvent& mme = *(Input::MouseMoveEvent*)evt.data;
-            x = (float)mme.xpos;
-            y = (float)mme.ypos;
-        }
-
         return false;
     }
 
-    void Model::DrawImmediate()
+    void Model::DrawImmediate(glm::mat4 mvp)
     {
-        glm::mat4 m = glm::mat4(1.f);
-        glm::mat4 p = glm::perspective(45.0f, 16.f / 9.f, 1.0f, 200.0f);
-        glm::mat4 mvp = p * m;
-
         glm::vec4 iColor(255, 255, 255, 255);
-
-        const Ray ray{ {0, 0, 0 }, {0, 0, -1.f } };
-        float distance = std::numeric_limits<float>::max();
-        unsigned int triangleIndex;
-        float u;
-        float v;
-
-        timer.reset();
-        bool simdIntersect = false;
-        if (simdIntersect = intersect(verticesPacked, numVerticesPacked, ray, distance, triangleIndex, u, v))
-        {
-        }
-        double simdTime = timer.get();
-        simdSamples++;
-        simdTotal += simdTime;
-
-        Vec3 out;
-        timer.reset();
-        bool linearIntersect = false;
-        if (linearIntersect = intersect2(this, &out, ray))
-        {
-        }
-        double linearTime = timer.get();
-        linearSamples++;
-        linearTotal += linearTime;
-
-        if (timer2.get() > 1000)
-        {
-            SANE_INFO("SIMD timing: {} -- Non SIMD timing: {} ({} vs {})", simdTotal / simdSamples, linearTotal / linearSamples, simdIntersect, linearIntersect);
-            timer2.reset();
-        }
 
         sProg_.Bind();
 

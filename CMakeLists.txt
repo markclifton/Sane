@@ -3,7 +3,7 @@ project (Sane)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_EXTENSIONS ON)
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/deps/glad)
 add_subdirectory(${PROJECT_SOURCE_DIR}/deps/glfw)
