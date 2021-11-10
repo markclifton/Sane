@@ -45,6 +45,7 @@ namespace
 namespace Sane
 {
   Display::Display(const char* name, int32_t width, int32_t height)
+    : Listener("Diplay")
   {
     if (!glfwInit())
       exit(EXIT_FAILURE);
@@ -117,5 +118,34 @@ namespace Sane
     glfwGetFramebufferSize(window_, &width, &height);
     ratio = width / (float)height;
     return glm::perspective(45.0f, ratio, 1.0f, 200.0f);
+  }
+
+  bool Display::ProcessEvent(Event& evt)
+  {
+    if (evt.action == kKeyEvent)
+    {
+      Input::KeyEvent& keyEvent = *(Input::KeyEvent*)evt.data;
+      switch (keyEvent.key)
+      {
+      case GLFW_KEY_ESCAPE:
+        glfwSetInputMode(*this, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        break;
+      default:
+        return false;
+      }
+    }
+    else if (evt.action == kMouseEvent)
+    {
+      Input::MouseEvent& me = *(Input::MouseEvent*)evt.data;
+      switch (me.action)
+      {
+      case GLFW_PRESS:
+        glfwSetInputMode(*this, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        break;
+      default:
+        return false;
+      }
+    }
+    return false;
   }
 }

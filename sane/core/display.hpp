@@ -11,7 +11,7 @@
 
 namespace Sane
 {
-  class Display : public Events::Dispatcher
+  class Display : public Events::Dispatcher, public Events::Listener
   {
   public:
     Display(const char* name, int32_t width, int32_t height);
@@ -26,6 +26,8 @@ namespace Sane
     operator GLFWwindow* () { return window_; }
 
     friend void resize_forwarder(GLFWwindow* window, int width, int height);
+
+    virtual bool ProcessEvent(Event& evt) override;
 
   private:
     GLFWwindow* window_;

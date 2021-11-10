@@ -40,15 +40,16 @@ namespace Sane
         {
             const auto camera0 = Registry().create();
             Registry().emplace<Sane::Components::Camera>(camera0, true);
-            Registry().emplace<Sane::Components::Position>(camera0, 2.f, 0.f, 0.f, 0.f);
+            Registry().emplace<Sane::Components::Position>(camera0, 2.f, -2.f, 0.f, 0.f);
             Registry().emplace<Sane::Components::Rotation>(camera0, 0.f, 0.f, 0.f);
-            Registry().emplace<Sane::Components::RenderContext>(camera0, 1920.f, 1080.f);
+            Registry().emplace<Sane::Components::RenderContext>(camera0, 2 * WIDTH, 2 * HEIGHT);
         }
 
         Systems::Camera camSystem(Registry());
         PushSystem(&camSystem);
         PushSystem(&scene);
 
+        double last = glfwGetTime();
         while (display_.IsRunning())
         {
             framebuffer.Bind();
@@ -56,8 +57,9 @@ namespace Sane
 
             for (auto& system : systems_)
             {
-                system->Update(0);
+                system->Update((glfwGetTime() - last) * 1000);
             }
+            last = glfwGetTime();
             framebuffer.Unbind();
 
             for (Layer* layer : layers_)

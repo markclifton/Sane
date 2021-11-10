@@ -1,5 +1,8 @@
 #pragma once
 
+#include <glm/ext.hpp>
+#include <glm/glm.hpp>
+
 namespace Sane
 {
     namespace Components
@@ -7,6 +10,8 @@ namespace Sane
         struct Camera
         {
             bool enabled;
+
+            glm::mat4 lookat{ 1.f };
         };
     }
 }

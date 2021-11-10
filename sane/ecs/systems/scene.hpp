@@ -35,10 +35,8 @@ namespace Sane
                         glClearColor(.05f, .06f, .11f, 1.f);
                         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-                        glm::mat4 rot = glm::rotate(glm::mat4(1.f), rotation.x, glm::vec3(1, 0, 0)) * glm::rotate(glm::mat4(1.f), rotation.y, glm::vec3(0, 1, 0)) * glm::rotate(glm::mat4(1.f), rotation.z, glm::vec3(0, 0, 1));
-                        glm::mat4 trans = glm::translate(glm::mat4(1.f), { position.x, position.y, position.z });
                         glm::mat4 p = glm::perspective(45.0f, 16.f / 9.f, 1.0f, 200.0f);
-                        glm::mat4 mvp = p * trans * rot;
+                        glm::mat4 mvp = p * camera.lookat;
 
                         model.DrawImmediate(mvp);
 
