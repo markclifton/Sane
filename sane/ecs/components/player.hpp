@@ -6,7 +6,7 @@ namespace Sane
     {
         struct Player
         {
-            bool t;
+            bool valid;
         };
     }
 }

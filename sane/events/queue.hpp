@@ -4,13 +4,13 @@
 #include <vector>
 
 #include "sane/events/event.hpp"
-#include "sane/layers/layer.hpp"
+#include "sane/systems/system.hpp"
 
 namespace Sane
 {
     namespace Events
     {
-        class Queue : public Layer
+        class Queue : public System
         {
             Queue();
             friend class Listener;
@@ -20,7 +20,7 @@ namespace Sane
             static Queue& Instance();
 
             static void Submit(Event& evt);
-            virtual void Update() override;
+            virtual void Update(double ts);
 
         private:
             static void AddListener(Listener* listener);

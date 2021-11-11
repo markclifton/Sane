@@ -8,7 +8,7 @@ namespace Sane
     namespace Events
     {
         Queue::Queue()
-            : Layer("EventQueue")
+            : System("EventQueue")
         {
         }
 
@@ -24,7 +24,7 @@ namespace Sane
             Instance().events_.push_back(new Event(evt.action, evt.detailedAction, evt.data, evt.size));
         }
 
-        void Queue::Update()
+        void Queue::Update(double ts)
         {
             std::lock_guard<std::mutex> lock(Instance().processingMutex_);
 

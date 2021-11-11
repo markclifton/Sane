@@ -1,5 +1,8 @@
 #include "sane/events/event.hpp"
 
+#include <cstdlib>
+#include <cstring>
+
 namespace Sane
 {
     Event::Event() {}

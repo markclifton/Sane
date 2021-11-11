@@ -5,6 +5,7 @@
 #include "sane/ecs/components/gravity.hpp"
 #include "sane/ecs/components/player.hpp"
 #include "sane/ecs/components/position.hpp"
+#include "sane/ecs/components/projectile.hpp"
 #include "sane/ecs/components/rendercontext.hpp"
 #include "sane/ecs/components/rotation.hpp"
 #include "sane/ecs/components/scale.hpp"

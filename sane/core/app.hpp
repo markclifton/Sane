@@ -1,16 +1,13 @@
 #pragma once
 
 #include <entt/entt.hpp>
-#include <vector>
 
 #include "sane/core/display.hpp"
-#include "sane/ecs/systems/system.hpp"
+#include "sane/systems/system.hpp"
 #include "sane/events/queue.hpp"
 #include "sane/graphics/framebuffer.hpp"
-#include "sane/layers/console.hpp"
-#include "sane/layers/gamewindow.hpp"
-#include "sane/layers/imgui.hpp"
-#include "sane/layers/stack.hpp"
+
+#include "sane/systems/common.hpp"
 
 namespace Sane
 {
@@ -21,13 +18,12 @@ namespace Sane
         virtual ~App() = default;
         void Run();
 
-        void PushLayer(Layer* layer);
-        void PushOverlay(Layer* layer);
-        void PopLayer(Layer* layer);
-        void PopOverlay(Layer* layer);
+        void PushLayer(System* layer);
+        void PushOverlay(System* layer);
+        void PopLayer(System* layer);
+        void PopOverlay(System* layer);
 
         entt::registry& Registry() { return registry_; }
-        void PushSystem(Systems::System* system) { systems_.push_back(system); }
 
         void DisplayConsole(bool Enable)
         {
@@ -42,13 +38,11 @@ namespace Sane
 
         entt::registry registry_;
         Events::Queue& evt_queue_;
-        Layers::Stack layers_;
+        Systems::Stack layers_;
 
         Display display_;
         ImguiBeginLayer imguiBegin_;
         ImguiEndLayer imguiEnd_;
-
-        std::vector<Systems::System*> systems_;
 
     protected:
         Framebuffer framebuffer;

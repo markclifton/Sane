@@ -81,6 +81,8 @@ namespace Sane
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    glfwSwapInterval(0);
+
     SANE_INFO("Created display");
   }
 
@@ -129,7 +131,7 @@ namespace Sane
       {
       case GLFW_KEY_ESCAPE:
         glfwSetInputMode(*this, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        break;
+        return false;
       default:
         return false;
       }
@@ -141,7 +143,7 @@ namespace Sane
       {
       case GLFW_PRESS:
         glfwSetInputMode(*this, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        break;
+        return false;
       default:
         return false;
       }

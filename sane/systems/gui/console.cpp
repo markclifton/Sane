@@ -1,14 +1,14 @@
-#include "sane/layers/console.hpp"
+#include "sane/systems/gui/console.hpp"
 
 namespace Sane
 {
     Console::Console()
-        : Layer("Console")
+        : System("Console")
         , sink_(Logging::GetSink())
     {
     }
 
-    void Console::Update()
+    void Console::RenderGui()
     {
         sink_->Render();
     }

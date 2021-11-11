@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sane/layers/layer.hpp"
+#include <cstdint>
 
 namespace Sane
 {

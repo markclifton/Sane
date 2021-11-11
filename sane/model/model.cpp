@@ -37,7 +37,7 @@ namespace
         vec3 origin = vec3(0,0,0);
         float test = clamp(distance(gl_Position.xyz, origin), 0, 10) / 10.f;
 
-        color.xyz =  vec3(1 - test, 1 - test, 1 - test);
+        color.xyz =  vec3(1,1,1); //1 - test, 1 - test, 1 - test);
     }
     )"";
 

@@ -6,15 +6,16 @@
 #include <windows.h>
 #endif
 
-#include "sane/logging/log.hpp"
-
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
 
 #include "sane/ecs/common.hpp"
+#include "sane/logging/log.hpp"
+#include "sane/systems/common.hpp"
+#include "sane/systems/ecs/scene.hpp"
 
-const int32_t WIDTH = 1280;
-const int32_t HEIGHT = 720;
+const int32_t WIDTH = 2560;
+const int32_t HEIGHT = 1440;
 
 namespace Sane
 {
@@ -36,59 +37,67 @@ namespace Sane
 
     void App::Run()
     {
-        Systems::Scene scene(Registry());
+        ECS::Scene scene(Registry());
         {
             const auto camera0 = Registry().create();
             Registry().emplace<Sane::Components::Camera>(camera0, true);
-            Registry().emplace<Sane::Components::Position>(camera0, 2.f, -2.f, 0.f, 0.f);
+            Registry().emplace<Sane::Components::Position>(camera0, glm::vec4(2.f, -4.f, 0.f, 0.f));
             Registry().emplace<Sane::Components::Rotation>(camera0, 0.f, 0.f, 0.f);
-            Registry().emplace<Sane::Components::RenderContext>(camera0, 2 * WIDTH, 2 * HEIGHT);
+            Registry().emplace<Sane::Components::RenderContext>(camera0, WIDTH, HEIGHT);
+            Registry().emplace<Sane::Components::Player>(camera0, true);
         }
-
-        Systems::Camera camSystem(Registry());
-        PushSystem(&camSystem);
-        PushSystem(&scene);
+        ECS::Camera camSystem(Registry());
+        ECS::Grid grid(Registry());
+        ECS::Projectile proj(Registry());
+        PushLayer(&proj);
+        PushLayer(&grid);
+        PushLayer(&camSystem);
+        PushLayer(&scene);
 
         double last = glfwGetTime();
         while (display_.IsRunning())
         {
-            framebuffer.Bind();
-            framebuffer.Clear();
-
-            for (auto& system : systems_)
+            for (auto& layer : layers_)
             {
-                system->Update((glfwGetTime() - last) * 1000);
+                layer->Update((glfwGetTime() - last) * 1000);
             }
             last = glfwGetTime();
+
+            framebuffer.Bind();
+            framebuffer.Clear();
+            for (auto& layer : layers_)
+            {
+                layer->RenderScene(display_.GetPersProjection());
+            }
             framebuffer.Unbind();
 
-            for (Layer* layer : layers_)
+            for (auto& layer : layers_)
             {
-                layer->Update();
+                layer->RenderGui();
             }
 
             display_.Update();
         }
     }
 
-    void App::PushLayer(Layer* layer)
+    void App::PushLayer(System* layer)
     {
         layers_.PushLayer(layer);
-        SANE_INFO("Pushed layer on stack: {}", layer->Name());
+        SANE_INFO("Pushed layer on stack: {}", layer->name);
     }
 
-    void App::PushOverlay(Layer* layer)
+    void App::PushOverlay(System* layer)
     {
         layers_.PushOverlay(layer);
-        SANE_INFO("Pushed overlay on stack: {}", layer->Name());
+        SANE_INFO("Pushed overlay on stack: {}", layer->name);
     }
 
-    void App::PopLayer(Layer* layer)
+    void App::PopLayer(System* layer)
     {
         layers_.PopLayer(layer);
     }
 
-    void App::PopOverlay(Layer* layer)
+    void App::PopOverlay(System* layer)
     {
         layers_.PopOverlay(layer);
     }

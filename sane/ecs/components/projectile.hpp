@@ -7,11 +7,9 @@ namespace Sane
 {
     namespace Components
     {
-        struct Camera
+        struct Projectile
         {
-            bool enabled;
-            glm::mat4 lookat{ 1.f };
-            glm::vec3 front;
+            float lifetime{ 0.f };
         };
     }
 }
