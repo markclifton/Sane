@@ -29,7 +29,26 @@ namespace
         out vec2 UV_ES_in[];
         float GetTessLevel(float Distance0, float Distance1)
         {
-            return 32.f;
+            float AvgDistance = (Distance0 + Distance1) / 2.0;
+
+            if (AvgDistance <= 100.0) {
+                return 32.0;
+            }
+            else if (AvgDistance <= 200.0) {
+                return 24.0;
+            }            
+            else if (AvgDistance <= 300.0) {
+                return 16.0;
+            }
+            else if (AvgDistance <= 400.0) {
+                return 8.0;
+            }
+            else if (AvgDistance <= 500.0) {
+                return 4.0;
+            }
+            else {
+                return 1.0;
+            }
         }
         void main()
         {
@@ -67,7 +86,7 @@ namespace
             UV_FS_in = interpolate2D(UV_ES_in[0], UV_ES_in[1], UV_ES_in[2]);    
             float Displacement = texture(tex, UV_FS_in.xy).x;
             vec3 worldPos = interpolate3D(WorldPos_ES_in[0], WorldPos_ES_in[1], WorldPos_ES_in[2]);
-            worldPos.y += 125.f * Displacement;  
+            worldPos.y += 75.f * Displacement;  
             gl_Position = MVP * vec4(worldPos, 1.0);
         }
     )"";
@@ -82,16 +101,6 @@ namespace
             FragColor = texture(tex, UV_FS_in);
         }
     )"";
-
-    constexpr float vertices[] = {
-        -1.0,  1.0, 0.0, 0, 1,
-         1.0,  1.0, 0.0, 1, 1,
-         1.0, -1.0, 0.0, 1, 0,
-         1.0, -1.0, 0.0, 1, 0,
-        -1.0, -1.0, 0.0, 0, 0,
-        -1.0,  1.0, 0.0, 0, 1,
-    };
-    constexpr uint32_t indices[] = { 0,1,2,2,3,0 };
 }
 
 namespace Sane
@@ -103,8 +112,6 @@ namespace Sane
             , sProg()
             , vertices_buffer(GL_ARRAY_BUFFER)
             , indices_buffer(GL_ELEMENT_ARRAY_BUFFER)
-            , vPos(sProg.GetAttribLocation("vPos"), 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0)
-            , vUV(sProg.GetAttribLocation("vUV"), 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(sizeof(float) * 3))
         {
             sProg.AddVertexShader(vs_grid);
             sProg.AddTessControlShader(tcs_grid);
@@ -132,13 +139,15 @@ namespace Sane
                 sProg.Bind();
 
                 vertices_buffer.Bind();
-                vPos.Enable();
-                vUV.Enable();
+                glEnableVertexAttribArray(0);
+                glVertexAttribPointer(sProg.GetAttribLocation("vPos"), 3, GL_FLOAT, GL_FALSE, 20, (void*)0);
+                glEnableVertexAttribArray(1);
+                glVertexAttribPointer(sProg.GetAttribLocation("vUV"), 2, GL_FLOAT, GL_FALSE, 20, (void*)12);
 
                 mvp *= camera.lookat;
 
                 glm::mat4 trans = glm::mat4(1.f); //glm::translate(glm::mat4(1.f), { position.data.x, -(position.data.y + 4), position.data.z });
-                glm::mat4 model_matrix = trans * glm::rotate(glm::mat4(1.f), 1.57079633f, { 1.f, 0.f, 0.f }) * glm::scale(glm::mat4(1.f), { 500, 500, 0 });
+                glm::mat4 model_matrix = trans * glm::rotate(glm::mat4(1.f), 1.57079633f, { 1.f, 0.f, 0.f }) * glm::scale(glm::mat4(1.f), { 50, 50, 0 });
 
                 glUniformMatrix4fv(sProg.GetUniformLocaition("MVP"), 1, GL_FALSE, (const GLfloat*)&mvp[0][0]);
                 glUniform3f(sProg.GetUniformLocaition("gEyeWorldPos"), position.data.x, position.data.y, position.data.z);
@@ -150,15 +159,16 @@ namespace Sane
                 glBindTexture(GL_TEXTURE_2D, heightmap.GetTextureId());
 
                 indices_buffer.Bind();
-                glDrawElements(GL_PATCHES, 6, GL_UNSIGNED_INT, (void*)0);
+                glDrawElements(GL_PATCHES, 32 * 32 * 6, GL_UNSIGNED_INT, (void*)0);
                 indices_buffer.Unbind();
 
                 glBindTexture(GL_TEXTURE_2D, 0);
                 //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-                vUV.Disable();
-                vPos.Disable();
+                glDisableVertexAttribArray(sProg.GetAttribLocation("vUV"));
+                glDisableVertexAttribArray(sProg.GetAttribLocation("vPos"));
                 vertices_buffer.Unbind();
+
                 sProg.Unbind();
 
                 glBindFramebuffer(GL_FRAMEBUFFER, old);
@@ -168,13 +178,38 @@ namespace Sane
 
         void Grid::OnAttach()
         {
+            auto genVerts = [](std::vector<float>& vertices, std::vector<uint32_t>& indices, int numRows, int numColumns) {
+                float xScale = 1.f / numRows;
+                float yScale = 1.f / numColumns;
+
+                uint32_t cellsCompleted = 0;
+                for (float row = 0.f; row < numRows; row += 1.f)
+                {
+                    for (float column = 0.f; column < numColumns; column += 1.f)
+                    {
+                        for (const auto x : { column,     row + 1, -1.f,  column * xScale,       (row + 1) * yScale }) vertices.push_back(x);
+                        for (const auto x : { column,     row,     -1.f,  column * xScale,        row * yScale }) vertices.push_back(x);
+                        for (const auto x : { column + 1, row,     -1.f, (column + 1) * xScale,   row * yScale }) vertices.push_back(x);
+                        for (const auto x : { column + 1, row + 1, -1.f, (column + 1) * xScale,  (row + 1) * yScale }) vertices.push_back(x);
+
+                        for (const auto x : { 0,1,2,2,3,0 }) indices.push_back(4 * cellsCompleted + x);
+
+                        cellsCompleted++;
+                    }
+                }
+            };
+
+            std::vector<float> verts;
+            std::vector<uint32_t> inds;
+            genVerts(verts, inds, 32, 32);
+
             sProg.Bind();
 
             vertices_buffer.Bind();
-            vertices_buffer.BufferData(sizeof(vertices), &vertices[0], GL_STATIC_DRAW);
+            vertices_buffer.BufferData(sizeof(float) * verts.size(), &verts[0], GL_STATIC_DRAW);
 
             indices_buffer.Bind();
-            indices_buffer.BufferData(sizeof(indices), &indices[0], GL_STATIC_DRAW);
+            indices_buffer.BufferData(sizeof(uint32_t) * inds.size(), &inds[0], GL_STATIC_DRAW);
 
             indices_buffer.Unbind();
             vertices_buffer.Unbind();

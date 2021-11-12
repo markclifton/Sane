@@ -12,8 +12,6 @@ namespace Sane
             ShaderProgram sProg;
             Buffer vertices_buffer;
             Buffer indices_buffer;
-            VertexAttrib vPos;
-            VertexAttrib vUV;
 
         public:
             Grid(entt::registry& registry);

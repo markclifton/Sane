@@ -123,7 +123,7 @@ namespace Sane
     int32_t width, height;
     glfwGetFramebufferSize(window_, &width, &height);
     ratio = width / (float)height;
-    return glm::perspective(45.0f, ratio, 1.0f, 2000.0f);
+    return glm::perspective(45.0f, ratio, 1.0f, 400.0f);
   }
 
   bool Display::ProcessEvent(Event& evt)

@@ -37,8 +37,6 @@ namespace Sane
             , normals_buffer(GL_ARRAY_BUFFER)
             , uvs_buffer(GL_ARRAY_BUFFER)
             , indices_buffer(GL_ELEMENT_ARRAY_BUFFER)
-            , vPos(sProg.GetAttribLocation("vPos"), 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0)
-            , vUV(sProg.GetAttribLocation("vUV"), 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)))
         {
         }
 
@@ -142,7 +140,7 @@ namespace Sane
                 ffront.y = 0.f;
                 ffront = glm::normalize(ffront);
 
-                float cameraSpeed = .1 * (1000. / ts);
+                float cameraSpeed = .08 * (1000. / ts);
                 glm::vec3 pos(position.data.x, position.data.y, position.data.z);
                 pos += z * cameraSpeed * ffront;
                 pos += x * glm::normalize(glm::cross(ffront, up)) * cameraSpeed;
@@ -167,19 +165,28 @@ namespace Sane
                 mvp = glm::ortho(-1.f, 1.f, 1.f, -1.f, 1.f, 100.f);
 
                 sProg.Bind();
+
                 vertices_buffer.Bind();
-                vPos.Enable();
-                vUV.Enable();
-                indices_buffer.Bind();
+
+                glEnableVertexAttribArray(0);
+                glVertexAttribPointer(sProg.GetAttribLocation("vPos"), 3, GL_FLOAT, GL_FALSE, 20, (void*)0);
+                glEnableVertexAttribArray(1);
+                glVertexAttribPointer(sProg.GetAttribLocation("vUV"), 2, GL_FLOAT, GL_FALSE, 20, (void*)12);
 
                 glUniformMatrix4fv(sProg.GetUniformLocaition("MVP"), 1, GL_FALSE, (const GLfloat*)&mvp[0][0]);
 
                 glBindTexture(GL_TEXTURE_2D, context.attachments[0]);
+
+                indices_buffer.Bind();
                 glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
+                indices_buffer.Unbind();
+
                 glBindTexture(GL_TEXTURE_2D, 0);
 
-                indices_buffer.Unbind();
+                glDisableVertexAttribArray(sProg.GetAttribLocation("vUV"));
+                glDisableVertexAttribArray(sProg.GetAttribLocation("vPos"));
                 vertices_buffer.Unbind();
+
                 sProg.Unbind();
                 }
             );
@@ -194,12 +201,12 @@ namespace Sane
 
             vertices_buffer.Bind();
             vertices_buffer.BufferData(sizeof(float) * 20, &vertices[0], GL_STATIC_DRAW);
+            vertices_buffer.Unbind();
 
             indices_buffer.Bind();
             indices_buffer.BufferData(sizeof(uint32_t) * 6, &indices[0], GL_STATIC_DRAW);
-
             indices_buffer.Unbind();
-            vertices_buffer.Unbind();
+
             sProg.Unbind();
         }
     }
