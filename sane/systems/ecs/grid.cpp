@@ -8,11 +8,14 @@ namespace
     static const char* vs_grid = R""(
         #version 450                                                                                                
         layout (location = 0) in vec3 vPos;
+        layout (location = 1) in vec2 vUV;
         out vec3 WorldPos_CS_in;
+        out vec2 UV_CS_in;
         uniform mat4 model;                                                                                    
         void main()
         {
             WorldPos_CS_in = (model * vec4(vPos, 1.f)).xyz;
+            UV_CS_in = vUV;
         }
     )"";
 
@@ -21,19 +24,16 @@ namespace
         layout (vertices = 3) out;
         uniform vec3 gEyeWorldPos;
         in vec3 WorldPos_CS_in[];
+        in vec2 UV_CS_in[];
         out vec3 WorldPos_ES_in[];
+        out vec2 UV_ES_in[];
         float GetTessLevel(float Distance0, float Distance1)
         {
-            float AvgDistance = (Distance0 + Distance1) / 2.0;
-
-            AvgDistance = (250 - AvgDistance);
-            if(AvgDistance < 0)
-                AvgDistance = 1;
-
-            return int((AvgDistance * AvgDistance) / 250.f) + 1.f;
+            return 32.f;
         }
         void main()
         {
+            UV_ES_in[gl_InvocationID] = UV_CS_in[gl_InvocationID];
             WorldPos_ES_in[gl_InvocationID] = WorldPos_CS_in[gl_InvocationID];
             float EyeToVertexDistance0 = distance(gEyeWorldPos, WorldPos_ES_in[0]);
             float EyeToVertexDistance1 = distance(gEyeWorldPos, WorldPos_ES_in[1]);
@@ -49,27 +49,48 @@ namespace
         #version 450 core
         layout(triangles, equal_spacing, cw) in;
         in vec3 WorldPos_ES_in[];
+        in vec2 UV_ES_in[];
+        out vec2 UV_FS_in;
         uniform mat4 MVP;
+        uniform mat4 model;                                                                                    
+        uniform sampler2D tex;
+        vec2 interpolate2D(vec2 v0, vec2 v1, vec2 v2)                                                   
+        {
+            return vec2(gl_TessCoord.x) * v0 + vec2(gl_TessCoord.y) * v1 + vec2(gl_TessCoord.z) * v2;
+        }
         vec3 interpolate3D(vec3 v0, vec3 v1, vec3 v2)
         {
             return vec3(gl_TessCoord.x) * v0 + vec3(gl_TessCoord.y) * v1 + vec3(gl_TessCoord.z) * v2;
         }
         void main()
         {
-            gl_Position = MVP * vec4(interpolate3D(WorldPos_ES_in[0], WorldPos_ES_in[1], WorldPos_ES_in[2]), 1.0);
+            UV_FS_in = interpolate2D(UV_ES_in[0], UV_ES_in[1], UV_ES_in[2]);    
+            float Displacement = texture(tex, UV_FS_in.xy).x;
+            vec3 worldPos = interpolate3D(WorldPos_ES_in[0], WorldPos_ES_in[1], WorldPos_ES_in[2]);
+            worldPos.y += 125.f * Displacement;  
+            gl_Position = MVP * vec4(worldPos, 1.0);
         }
     )"";
 
     static const char* fs_grid = R""(
         #version 450 core
         out vec4 FragColor;
+        in vec2 UV_FS_in;
+        uniform sampler2D tex;
         void main()
         {
-            FragColor = vec4(1,1,1,1);
+            FragColor = texture(tex, UV_FS_in);
         }
     )"";
 
-    constexpr float vertices[] = { -1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, -1.0, 0.0, 1.0, -1.0, 0.0, -1.0, -1.0, 0.0, -1.0, 1.0, 0.0 };
+    constexpr float vertices[] = {
+        -1.0,  1.0, 0.0, 0, 1,
+         1.0,  1.0, 0.0, 1, 1,
+         1.0, -1.0, 0.0, 1, 0,
+         1.0, -1.0, 0.0, 1, 0,
+        -1.0, -1.0, 0.0, 0, 0,
+        -1.0,  1.0, 0.0, 0, 1,
+    };
     constexpr uint32_t indices[] = { 0,1,2,2,3,0 };
 }
 
@@ -82,7 +103,8 @@ namespace Sane
             , sProg()
             , vertices_buffer(GL_ARRAY_BUFFER)
             , indices_buffer(GL_ELEMENT_ARRAY_BUFFER)
-            , vPos(sProg.GetAttribLocation("vPos"), 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0)
+            , vPos(sProg.GetAttribLocation("vPos"), 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0)
+            , vUV(sProg.GetAttribLocation("vUV"), 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(sizeof(float) * 3))
         {
             sProg.AddVertexShader(vs_grid);
             sProg.AddTessControlShader(tcs_grid);
@@ -111,21 +133,30 @@ namespace Sane
 
                 vertices_buffer.Bind();
                 vPos.Enable();
+                vUV.Enable();
 
                 mvp *= camera.lookat;
-                static glm::mat4 model_matrix = glm::rotate(glm::mat4(1.f), 1.57079633f, { 1.f, 0.f, 0.f }) * glm::scale(glm::mat4(1.f), { 100, 100, 0 });
+
+                glm::mat4 trans = glm::mat4(1.f); //glm::translate(glm::mat4(1.f), { position.data.x, -(position.data.y + 4), position.data.z });
+                glm::mat4 model_matrix = trans * glm::rotate(glm::mat4(1.f), 1.57079633f, { 1.f, 0.f, 0.f }) * glm::scale(glm::mat4(1.f), { 500, 500, 0 });
 
                 glUniformMatrix4fv(sProg.GetUniformLocaition("MVP"), 1, GL_FALSE, (const GLfloat*)&mvp[0][0]);
                 glUniform3f(sProg.GetUniformLocaition("gEyeWorldPos"), position.data.x, position.data.y, position.data.z);
 
                 glUniformMatrix4fv(sProg.GetUniformLocaition("model"), 1, GL_FALSE, (const GLfloat*)&model_matrix[0][0]);
 
-                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+                //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+                static Texture heightmap("img/heightmap.png");
+                glBindTexture(GL_TEXTURE_2D, heightmap.GetTextureId());
+
                 indices_buffer.Bind();
                 glDrawElements(GL_PATCHES, 6, GL_UNSIGNED_INT, (void*)0);
                 indices_buffer.Unbind();
-                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+                glBindTexture(GL_TEXTURE_2D, 0);
+                //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+                vUV.Disable();
                 vPos.Disable();
                 vertices_buffer.Unbind();
                 sProg.Unbind();

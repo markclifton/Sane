@@ -81,11 +81,11 @@ namespace Sane
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    //glFrontFace(GL_CW);
-    //glCullFace(GL_BACK);
-    //glEnable(GL_CULL_FACE);
+    glFrontFace(GL_CW);
+    glCullFace(GL_BACK);
+    glEnable(GL_CULL_FACE);
 
-    glfwSwapInterval(0);
+    //glfwSwapInterval(0);
 
     SANE_INFO("Created display");
   }
@@ -123,7 +123,7 @@ namespace Sane
     int32_t width, height;
     glfwGetFramebufferSize(window_, &width, &height);
     ratio = width / (float)height;
-    return glm::perspective(45.0f, ratio, 1.0f, 1000.0f);
+    return glm::perspective(45.0f, ratio, 1.0f, 2000.0f);
   }
 
   bool Display::ProcessEvent(Event& evt)

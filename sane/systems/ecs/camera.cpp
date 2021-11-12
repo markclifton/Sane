@@ -68,10 +68,10 @@ namespace Sane
                     z -= speed;
                     break;
                 case GLFW_KEY_R:
-                    y -= speed * .125f;
+                    y -= speed;
                     break;
                 case GLFW_KEY_F:
-                    y += speed * .125f;
+                    y += speed;
                     break;
                 case GLFW_KEY_ESCAPE:
                     enableMouseMovement = firstMovement = false;
@@ -142,11 +142,11 @@ namespace Sane
                 ffront.y = 0.f;
                 ffront = glm::normalize(ffront);
 
-                float cameraSpeed = .025 * ts;
+                float cameraSpeed = .1 * (1000. / ts);
                 glm::vec3 pos(position.data.x, position.data.y, position.data.z);
                 pos += z * cameraSpeed * ffront;
                 pos += x * glm::normalize(glm::cross(ffront, up)) * cameraSpeed;
-                pos.y += y;
+                pos.y += y * cameraSpeed;
 
                 camera.lookat = glm::lookAt(pos, pos + camera.front, up) * glm::scale(glm::mat4(1.f), { 1, -1, 1 });
 
