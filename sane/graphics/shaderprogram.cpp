@@ -6,61 +6,113 @@
 
 namespace Sane
 {
-  ShaderProgram::ShaderProgram(const char* VS_Contents, const char* FS_Contents)
+  ShaderProgram::ShaderProgram()
   {
-    GLint compiled;
-
-    vertex_shader_ = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex_shader_, 1, &VS_Contents, NULL);
-    glCompileShader(vertex_shader_);
-    glGetShaderiv(vertex_shader_, GL_COMPILE_STATUS, &compiled);
-    if (!compiled) {
-      GLint log_length;
-      glGetShaderiv(vertex_shader_, GL_INFO_LOG_LENGTH, &log_length);
-      std::vector<char> v(static_cast<size_t>(log_length));
-      glGetShaderInfoLog(vertex_shader_, log_length, nullptr, v.data());
-      std::string err(begin(v), end(v));
-
-      err.pop_back();
-      err.pop_back();
-
-      glDeleteShader(vertex_shader_);
-      SANE_ERROR("Failed to compile vertex shader: {}", err);
-    }
-
-    fragment_shader_ = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment_shader_, 1, &FS_Contents, NULL);
-    glCompileShader(fragment_shader_);
-    glGetShaderiv(fragment_shader_, GL_COMPILE_STATUS, &compiled);
-    if (!compiled) {
-      GLint log_length;
-      glGetShaderiv(fragment_shader_, GL_INFO_LOG_LENGTH, &log_length);
-      std::vector<char> v(static_cast<size_t>(log_length));
-      glGetShaderInfoLog(fragment_shader_, log_length, nullptr, v.data());
-      std::string err(begin(v), end(v));
-
-      err.pop_back();
-      err.pop_back();
-
-      glDeleteShader(fragment_shader_);
-      SANE_ERROR("Failed to compile fragment shader: {}", err);
-    }
-
     program_ = glCreateProgram();
-    glAttachShader(program_, vertex_shader_);
-    glAttachShader(program_, fragment_shader_);
-    glLinkProgram(program_);
+  }
 
-    glDeleteShader(vertex_shader_);
-    glDeleteShader(fragment_shader_);
-
-    SANE_INFO("Created shader program: {}", program_);
+  ShaderProgram::ShaderProgram(const char* VS_Contents, const char* FS_Contents)
+    : ShaderProgram()
+  {
+    AddVertexShader(VS_Contents);
+    AddFragmentShader(FS_Contents);
+    Finalize();
   }
 
   ShaderProgram::~ShaderProgram()
   {
     glDeleteProgram(program_);
     SANE_INFO("Destroyed shader program: {}", program_);
+  }
+
+  ShaderProgram& ShaderProgram::Finalize()
+  {
+    if (shaders_.empty())
+      return *this;
+
+    glLinkProgram(program_);
+
+    GLint Success = 0;
+    GLchar ErrorLog[1024] = { 0 };
+
+    glGetProgramiv(program_, GL_LINK_STATUS, &Success);
+    if (Success == 0) {
+      glGetProgramInfoLog(program_, sizeof(ErrorLog), NULL, ErrorLog);
+      SANE_ERROR("Error linking shader program: {}", ErrorLog);
+      return *this;
+    }
+
+    glValidateProgram(program_);
+    glGetProgramiv(program_, GL_VALIDATE_STATUS, &Success);
+    if (!Success) {
+      glGetProgramInfoLog(program_, sizeof(ErrorLog), NULL, ErrorLog);
+      SANE_ERROR("Invalid shader program: {}", ErrorLog);
+    }
+
+    for (auto shader : shaders_)
+      glDeleteShader(shader);
+
+    shaders_.clear();
+
+    return *this;
+  }
+
+  void ShaderProgram::AddShader(const char* contents, uint32_t type)
+  {
+    uint32_t shader = glCreateShader(type);
+    shaders_.push_back(shader);
+
+    glShaderSource(shader, 1, &contents, NULL);
+    glCompileShader(shader);
+
+    GLint compiled;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
+    if (!compiled)
+    {
+      GLint log_length;
+      glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &log_length);
+      std::vector<char> v(static_cast<size_t>(log_length));
+      glGetShaderInfoLog(shader, log_length, nullptr, v.data());
+      std::string err(begin(v), end(v));
+
+      err.pop_back();
+      err.pop_back();
+
+      glDeleteShader(shader);
+      SANE_ERROR("Failed to compile {} shader: {}", type, err);
+    }
+
+    glAttachShader(program_, shader);
+  }
+
+  ShaderProgram& ShaderProgram::AddVertexShader(const char* contents)
+  {
+    AddShader(contents, GL_VERTEX_SHADER);
+    return *this;
+  }
+
+  ShaderProgram& ShaderProgram::AddFragmentShader(const char* contents)
+  {
+    AddShader(contents, GL_FRAGMENT_SHADER);
+    return *this;
+  }
+
+  ShaderProgram& ShaderProgram::AddTessControlShader(const char* contents)
+  {
+    AddShader(contents, GL_TESS_CONTROL_SHADER);
+    return *this;
+  }
+
+  ShaderProgram& ShaderProgram::AddTessEvaluationShader(const char* contents)
+  {
+    AddShader(contents, GL_TESS_EVALUATION_SHADER);
+    return *this;
+  }
+
+  ShaderProgram& ShaderProgram::AddGeometryShader(const char* contents)
+  {
+    AddShader(contents, GL_GEOMETRY_SHADER);
+    return *this;
   }
 
   void ShaderProgram::Bind()

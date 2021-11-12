@@ -1,14 +1,24 @@
 #pragma once
 
 #include <cstdint>
+#include <vector>
 
 namespace Sane
 {
   class ShaderProgram
   {
   public:
+    ShaderProgram();
     ShaderProgram(const char* VS_Contents, const char* FS_Contents);
     ~ShaderProgram();
+
+    ShaderProgram& Finalize();
+    void AddShader(const char* contents, uint32_t type);
+    ShaderProgram& AddVertexShader(const char* contents);
+    ShaderProgram& AddFragmentShader(const char* contents);
+    ShaderProgram& AddTessControlShader(const char* contents);
+    ShaderProgram& AddTessEvaluationShader(const char* contents);
+    ShaderProgram& AddGeometryShader(const char* contents);
 
     void Bind();
     void Unbind();
@@ -20,8 +30,7 @@ namespace Sane
 
   private:
     uint32_t program_;
-    uint32_t vertex_shader_;
-    uint32_t fragment_shader_;
+    std::vector<uint32_t> shaders_;
   };
 
   class VertexAttrib

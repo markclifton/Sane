@@ -37,7 +37,6 @@ namespace Sane
 
     void App::Run()
     {
-        ECS::Scene scene(Registry());
         {
             const auto camera0 = Registry().create();
             Registry().emplace<Sane::Components::Camera>(camera0, true);
@@ -46,13 +45,15 @@ namespace Sane
             Registry().emplace<Sane::Components::RenderContext>(camera0, WIDTH, HEIGHT);
             Registry().emplace<Sane::Components::Player>(camera0, true);
         }
+
+        ECS::Scene scene(Registry());
         ECS::Camera camSystem(Registry());
         ECS::Grid grid(Registry());
-        ECS::Projectile proj(Registry());
-        PushLayer(&proj);
+        //ECS::Projectile proj(Registry());
         PushLayer(&grid);
-        PushLayer(&camSystem);
+        //PushLayer(&proj);
         PushLayer(&scene);
+        PushLayer(&camSystem);
 
         double last = glfwGetTime();
         while (display_.IsRunning())

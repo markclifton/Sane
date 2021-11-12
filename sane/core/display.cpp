@@ -51,8 +51,8 @@ namespace Sane
       exit(EXIT_FAILURE);
 
     glfwWindowHint(GLFW_SAMPLES, 8);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
@@ -80,6 +80,10 @@ namespace Sane
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    //glFrontFace(GL_CW);
+    //glCullFace(GL_BACK);
+    //glEnable(GL_CULL_FACE);
 
     glfwSwapInterval(0);
 
@@ -119,7 +123,7 @@ namespace Sane
     int32_t width, height;
     glfwGetFramebufferSize(window_, &width, &height);
     ratio = width / (float)height;
-    return glm::perspective(45.0f, ratio, 1.0f, 200.0f);
+    return glm::perspective(45.0f, ratio, 1.0f, 1000.0f);
   }
 
   bool Display::ProcessEvent(Event& evt)

@@ -22,7 +22,7 @@ namespace Sane
             VertexAttrib vPos;
             VertexAttrib vUV;
 
-            float x{ 0 }, z{ 0 };
+            float x{ 0 }, y{0}, z{ 0 };
             float pitch{ 0 }, yaw{ -90.f };
 
             bool enableMouseMovement{ false };

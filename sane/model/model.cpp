@@ -25,29 +25,29 @@ namespace
     }
 
     static const char* vs_modern = R""(
-    #version 330
-    layout(location = 0) in vec3 vPos;
-    uniform vec4 iColor;
-    uniform mat4 MVP;
-    out vec4 color;
-    void main() {
-      gl_Position = MVP * vec4(vPos, 1.0);
-      color = iColor;
+        #version 330
+        layout(location = 0) in vec3 vPos;
+        uniform vec4 iColor;
+        uniform mat4 MVP;
+        out vec4 color;
+        void main() {
+        gl_Position = MVP * vec4(vPos, 1.0);
+        color = iColor;
 
-        vec3 origin = vec3(0,0,0);
-        float test = clamp(distance(gl_Position.xyz, origin), 0, 10) / 10.f;
+            vec3 origin = vec3(0,0,0);
+            float test = clamp(distance(gl_Position.xyz, origin), 0, 10) / 10.f;
 
-        color.xyz =  vec3(1,1,1); //1 - test, 1 - test, 1 - test);
-    }
+            color.xyz =  vec3(1,1,1); //1 - test, 1 - test, 1 - test);
+        }
     )"";
 
     static const char* fs_modern = R""(
-    #version 330
-    out vec4 outColor;
-    in vec4 color;
-    void main() {
-      outColor = color;
-    }
+        #version 330
+        out vec4 outColor;
+        in vec4 color;
+        void main() {
+        outColor = color;
+        }
     )"";
 }
 

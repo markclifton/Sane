@@ -26,9 +26,6 @@ namespace Sane
                 glBindFramebuffer(GL_FRAMEBUFFER, context.framebuffer);
                 glViewport(0, 0, context.width, context.height);
 
-                glClearColor(.05f, .06f, .11f, 1.f);
-                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
                 model.DrawImmediate(mvp * camera.lookat);
 
                 glBindFramebuffer(GL_FRAMEBUFFER, old);
