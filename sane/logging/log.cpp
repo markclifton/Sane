@@ -104,15 +104,14 @@ namespace Sane
 	}
 
 	namespace {
-#pragma warning(disable : 4996)
 		std::string format_time_point(std::chrono::system_clock::time_point point)
 		{
-			std::string out(29, '0');
-			char* buf = &out[0];
 			time_t now_c = std::chrono::system_clock::to_time_t(point);
-			strftime(buf, 21, "%Y-%m-%d %H:%M:%S.", localtime(&now_c));
-			sprintf_s(buf + 20, 10, "%09ld", size_t(point.time_since_epoch().count() % 1000000000));
-			return out;
+			char buf[100];
+			if (std::strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S.", localtime(&now_c))) {
+				return std::string(buf) + std::to_string(point.time_since_epoch().count() % 1000000000);
+			}
+			return std::to_string(point.time_since_epoch().count());
 		}
 	}
 

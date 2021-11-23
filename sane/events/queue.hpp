@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "sane/events/event.hpp"
+#include "sane/events/listener.hpp"
 #include "sane/systems/system.hpp"
 
 namespace Sane
