@@ -11,7 +11,8 @@ namespace Sane
         {
             bool enabled;
             glm::mat4 lookat{ 1.f };
-            glm::vec3 front;
+            glm::vec3 front{ 0.f, 0.f, 0.f };
+            float velocity{ 1.f };
         };
     }
 }

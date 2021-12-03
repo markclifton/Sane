@@ -70,6 +70,7 @@ namespace
         in vec3 WorldPos_ES_in[];
         in vec2 UV_ES_in[];
         out vec2 UV_FS_in;
+        out float Displacement;
         uniform mat4 MVP;
         uniform mat4 model;                                                                                    
         uniform sampler2D tex;
@@ -84,7 +85,7 @@ namespace
         void main()
         {
             UV_FS_in = interpolate2D(UV_ES_in[0], UV_ES_in[1], UV_ES_in[2]);    
-            float Displacement = texture(tex, UV_FS_in.xy).x;
+            Displacement = texture(tex, UV_FS_in.xy).x;
             vec3 worldPos = interpolate3D(WorldPos_ES_in[0], WorldPos_ES_in[1], WorldPos_ES_in[2]);
             worldPos.y += 75.f * Displacement;  
             gl_Position = MVP * vec4(worldPos, 1.0);
@@ -95,10 +96,28 @@ namespace
         #version 450 core
         out vec4 FragColor;
         in vec2 UV_FS_in;
+        in float Displacement;
         uniform sampler2D tex;
         void main()
         {
             FragColor = texture(tex, UV_FS_in);
+
+            if(Displacement < .05f)
+            {
+                float factor = 3.f;
+
+                FragColor.r *= .0f * factor;
+                FragColor.g *= .3f * factor;
+                FragColor.b *= .8f * factor;
+            }
+            else if(Displacement < .2f)
+            {
+                float factor = (.2f - Displacement);
+                factor = 1.f - clamp(factor, 0.f, 1.f);
+                FragColor.r *= .0f * factor;
+                FragColor.g *= factor * factor;
+                FragColor.b *= .0f * factor;
+            }
         }
     )"";
 }
@@ -107,11 +126,12 @@ namespace Sane
 {
     namespace ECS
     {
-        Grid::Grid(entt::registry& registry)
+        Grid::Grid(entt::registry& registry, uint32_t size)
             : SystemBase("GridSystem", registry)
             , sProg()
             , vertices_buffer(GL_ARRAY_BUFFER)
             , indices_buffer(GL_ELEMENT_ARRAY_BUFFER)
+            , size(size)
         {
             sProg.AddVertexShader(vs_grid);
             sProg.AddTessControlShader(tcs_grid);
@@ -146,7 +166,7 @@ namespace Sane
 
                 mvp *= camera.lookat;
 
-                glm::mat4 trans = glm::mat4(1.f); //glm::translate(glm::mat4(1.f), { position.data.x, -(position.data.y + 4), position.data.z });
+                glm::mat4 trans = glm::scale(glm::mat4(1.f), glm::vec3(10, 1, 10));// glm::mat4(1.f); //glm::translate(glm::mat4(1.f), { position.data.x, -(position.data.y + 4), position.data.z });
                 glm::mat4 model_matrix = trans * glm::rotate(glm::mat4(1.f), 1.57079633f, { 1.f, 0.f, 0.f }) * glm::scale(glm::mat4(1.f), { 50, 50, 0 });
 
                 glUniformMatrix4fv(sProg.GetUniformLocaition("MVP"), 1, GL_FALSE, (const GLfloat*)&mvp[0][0]);
@@ -159,7 +179,7 @@ namespace Sane
                 glBindTexture(GL_TEXTURE_2D, heightmap.GetTextureId());
 
                 indices_buffer.Bind();
-                glDrawElements(GL_PATCHES, 32 * 32 * 6, GL_UNSIGNED_INT, (void*)0);
+                glDrawElements(GL_PATCHES, size * size * 6, GL_UNSIGNED_INT, (void*)0);
                 indices_buffer.Unbind();
 
                 glBindTexture(GL_TEXTURE_2D, 0);
@@ -201,7 +221,7 @@ namespace Sane
 
             std::vector<float> verts;
             std::vector<uint32_t> inds;
-            genVerts(verts, inds, 32, 32);
+            genVerts(verts, inds, size, size);
 
             sProg.Bind();
 

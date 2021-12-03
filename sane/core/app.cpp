@@ -39,7 +39,7 @@ namespace Sane
     {
         {
             const auto camera0 = Registry().create();
-            Registry().emplace<Sane::Components::Camera>(camera0, true);
+            Registry().emplace<Sane::Components::Camera>(camera0, true, glm::mat4(1.f), glm::vec3(0.f, 0.f, 0.f), 10.0f);
             Registry().emplace<Sane::Components::Position>(camera0, glm::vec4(2.f, -4.f, 0.f, 0.f));
             Registry().emplace<Sane::Components::Rotation>(camera0, 0.f, 0.f, 0.f);
             Registry().emplace<Sane::Components::RenderContext>(camera0, WIDTH, HEIGHT);
@@ -48,7 +48,7 @@ namespace Sane
 
         ECS::Scene scene(Registry());
         ECS::Camera camSystem(Registry());
-        ECS::Grid grid(Registry());
+        ECS::Grid grid(Registry(), 16);
         //ECS::Projectile proj(Registry());
         PushLayer(&grid);
         //PushLayer(&proj);

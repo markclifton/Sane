@@ -140,7 +140,7 @@ namespace Sane
                 ffront.y = 0.f;
                 ffront = glm::normalize(ffront);
 
-                float cameraSpeed = .08 * (1000. / ts);
+                float cameraSpeed = camera.velocity * (ts / 16.67f);
                 glm::vec3 pos(position.data.x, position.data.y, position.data.z);
                 pos += z * cameraSpeed * ffront;
                 pos += x * glm::normalize(glm::cross(ffront, up)) * cameraSpeed;
@@ -194,7 +194,11 @@ namespace Sane
 
         void Camera::OnAttach()
         {
-            static float vertices[]{ -1, 1,-1, 0, 0, -1,-1,-1, 0, 1, 1,-1,-1, 1, 1, 1, 1,-1, 1, 0 };
+            static float vertices[]{
+                -1, 1,-1, 0, 0,
+                -1,-1,-1, 0, 1,
+                 1,-1,-1, 1, 1,
+                 1, 1,-1, 1, 0 };
             static uint32_t indices[]{ 0, 1, 2, 0, 2, 3 };
 
             sProg.Bind();
