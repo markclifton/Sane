@@ -13,6 +13,7 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/deps/entt)
 add_subdirectory(${PROJECT_SOURCE_DIR}/deps/stb_image)
 add_subdirectory(${PROJECT_SOURCE_DIR}/deps/simd_moc)
 add_subdirectory(${PROJECT_SOURCE_DIR}/deps/spdlog)
+add_subdirectory(${PROJECT_SOURCE_DIR}/deps/tinyxml2)
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -61,6 +62,7 @@ else()
         stb_image
         simd_moc
         spdlog::spdlog
+        tinyxml2
     )
 
 endif()
