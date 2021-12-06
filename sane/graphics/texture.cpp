@@ -41,7 +41,7 @@ namespace Sane
 
         stbi_image_free(data);
 
-        SANE_ERROR("Successfully loaded texture: {}", path);
+        SANE_DEBUG("Successfully loaded texture: {}", path);
     }
 
     Texture::~Texture()

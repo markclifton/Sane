@@ -6,9 +6,6 @@
 #include <windows.h>
 #endif
 
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include <stb_image_write.h>
-
 #include "sane/ecs/common.hpp"
 #include "sane/logging/log.hpp"
 #include "sane/systems/common.hpp"
@@ -37,24 +34,6 @@ namespace Sane
 
     void App::Run()
     {
-        {
-            const auto camera0 = Registry().create();
-            Registry().emplace<Sane::Components::Camera>(camera0, true, glm::mat4(1.f), glm::vec3(0.f, 0.f, 0.f), 10.0f);
-            Registry().emplace<Sane::Components::Position>(camera0, glm::vec4(2.f, -4.f, 0.f, 0.f));
-            Registry().emplace<Sane::Components::Rotation>(camera0, 0.f, 0.f, 0.f);
-            Registry().emplace<Sane::Components::RenderContext>(camera0, WIDTH, HEIGHT);
-            Registry().emplace<Sane::Components::Player>(camera0, true);
-        }
-
-        ECS::Scene scene(Registry());
-        ECS::Camera camSystem(Registry());
-        ECS::Grid grid(Registry(), 16);
-        //ECS::Projectile proj(Registry());
-        PushLayer(&grid);
-        //PushLayer(&proj);
-        PushLayer(&scene);
-        PushLayer(&camSystem);
-
         double last = glfwGetTime();
         while (display_.IsRunning())
         {

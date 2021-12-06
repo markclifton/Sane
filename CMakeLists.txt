@@ -36,6 +36,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${PROJECT_SOURCE_DIR}/deps/simd_moc/include
     ${PROJECT_SOURCE_DIR}/deps/spdlog/include
     ${PROJECT_SOURCE_DIR}/deps/simd_moc/include
+    ${PROJECT_SOURCE_DIR}/deps/tinyxml2
 )
 
 if (${APPLE})

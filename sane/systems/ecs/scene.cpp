@@ -26,9 +26,6 @@ namespace Sane
                 glBindFramebuffer(GL_FRAMEBUFFER, context.framebuffer);
                 glViewport(0, 0, context.width, context.height);
 
-                glm::mat4 scale = glm::scale(glm::mat4(1.f), { 4,4,4 });
-                glm::mat4 trans = glm::translate(glm::mat4(1.f), { position.data.x, -(position.data.y + 4), position.data.z });
-
                 model.DrawImmediate(mvp * camera.lookat);
 
                 glBindFramebuffer(GL_FRAMEBUFFER, old);

@@ -4,6 +4,7 @@
 #include "sane/events/event.hpp"
 #include "sane/events/inputs.hpp"
 #include "sane/events/listener.hpp"
+#include "sane/events/load.hpp"
 
 namespace Sane
 {
@@ -14,7 +15,8 @@ namespace Sane
         kMouseEvent = 2,
         kMouseMoveEvent = 3,
         kDisplayResizeEvent = 4,
-        kDisplaySizeRequestEvent = 5
+        kDisplaySizeRequestEvent = 5,
+        kLoadEvent = 6
     };
 
     struct DisplayResizeEvent
