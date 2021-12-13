@@ -1,4 +1,4 @@
-#include "sane/systems/ecs/creator.hpp"
+#include "sane/systems/ecs/loader.hpp"
 
 #include <tinyxml2.h>
 
@@ -8,13 +8,13 @@ namespace Sane
 {
     namespace ECS
     {
-        Creator::Creator(entt::registry& registry)
-            : SystemBase("CreatorSystem", registry)
-            , Events::Listener("CreatorSystem")
+        Loader::Loader(entt::registry& registry)
+            : SystemBase("LoaderSystem", registry)
+            , Events::Listener("LoaderSystem")
         {
         }
 
-        bool Creator::ProcessEvent(Event& event)
+        bool Loader::ProcessEvent(Event& event)
         {
             if (event.action == kLoadEvent)
             {
@@ -25,7 +25,7 @@ namespace Sane
             return false;
         }
 
-        bool Creator::LoadFile(const char* filepath)
+        bool Loader::LoadFile(const char* filepath)
         {
             tinyxml2::XMLDocument doc;
             if (doc.LoadFile(filepath) != tinyxml2::XMLError::XML_SUCCESS)

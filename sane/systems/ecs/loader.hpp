@@ -8,13 +8,13 @@ namespace Sane
 {
     namespace ECS
     {
-        class Creator : public SystemBase, public Events::Listener
+        class Loader : public SystemBase, public Events::Listener
         {
         public:
-            Creator(entt::registry& registry);
-
+            Loader(entt::registry& registry);
             virtual bool ProcessEvent(Event& event) override;
 
+        private:
             bool LoadFile(const char* filepath);
         };
     }

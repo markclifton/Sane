@@ -106,12 +106,19 @@ namespace Sane
 	namespace {
 		std::string format_time_point(std::chrono::system_clock::time_point point)
 		{
-			time_t now_c = std::chrono::system_clock::to_time_t(point);
-			char buf[100];
-			if (std::strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S.", localtime(&now_c))) {
-				return std::string(buf) + std::to_string(point.time_since_epoch().count() % 1000000000);
-			}
-			return std::to_string(point.time_since_epoch().count());
+			std::time_t timer = std::chrono::system_clock::to_time_t(point);
+			std::tm tm{};
+#if defined(__unix__)
+			localtime_r(&timer, &tm);
+#elif defined(_MSC_VER)
+			localtime_s(&tm, &timer);
+#else
+			static std::mutex mtx;
+			std::lock_guard<std::mutex> lock(mtx);
+			tm = *std::localtime(&timer);
+#endif
+			char buf[64];
+			return std::string(buf, std::strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S.", &tm)) + std::to_string(point.time_since_epoch().count() % 1000000000);
 		}
 	}
 
@@ -127,7 +134,7 @@ namespace Sane
 			AddLog("[WARN]  %s :: %s\n", time.c_str(), std::string(msg.payload.data(), msg.payload.size()).c_str());
 			break;
 		case spdlog::level::err:
-			AddLog("[FATAL] %s :: %s\n", time.c_str(), std::string(msg.payload.data(), msg.payload.size()).c_str());
+			AddLog("[ERROR] %s :: %s\n", time.c_str(), std::string(msg.payload.data(), msg.payload.size()).c_str());
 			break;
 		default:
 			AddLog("[INFO]  %s :: %s\n", time.c_str(), std::string(msg.payload.data(), msg.payload.size()).c_str());
@@ -157,6 +164,4 @@ namespace Sane
 			if (buffer_[old_size] == '\n')
 				lineOffsets_.push_back(old_size + 1);
 	}
-
-
 }

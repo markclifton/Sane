@@ -39,31 +39,17 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${PROJECT_SOURCE_DIR}/deps/tinyxml2
 )
 
-if (${APPLE})
-    target_link_libraries(${PROJECT_NAME}
+
+find_package(OpenGL REQUIRED)
+target_link_libraries(${PROJECT_NAME}
     glad
     glfw
     glm
     imgui
+    OpenGL::GL
     EnTT::EnTT
     stb_image
     simd_moc
     spdlog::spdlog
-    )
-    
-else()
-    find_package(OpenGL REQUIRED)
-    target_link_libraries(${PROJECT_NAME}
-        glad
-        glfw
-        glm
-        imgui
-        OpenGL::GL
-        EnTT::EnTT
-        stb_image
-        simd_moc
-        spdlog::spdlog
-        tinyxml2
-    )
-
-endif()
+    tinyxml2
+)
