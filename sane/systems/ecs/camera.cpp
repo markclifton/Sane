@@ -73,7 +73,7 @@ namespace Sane
                 case GLFW_KEY_F:
                     y += speed;
                     break;
-                case GLFW_KEY_ESCAPE:
+                case GLFW_KEY_GRAVE_ACCENT:
                     enableMouseMovement = firstMovement = false;
                     break;
                 default:
@@ -121,7 +121,7 @@ namespace Sane
                     glBindFramebuffer(GL_FRAMEBUFFER, context.framebuffer);
                     glViewport(0, 0, context.width, context.height);
 
-                    glClearColor(.2f, .3f, .8f, 1.f);
+                    glClearColor(.5f, .5f, .5f, 1.f);
                     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
                     glBindFramebuffer(GL_FRAMEBUFFER, old);

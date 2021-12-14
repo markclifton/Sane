@@ -128,6 +128,9 @@ namespace Sane
       switch (keyEvent.key)
       {
       case GLFW_KEY_ESCAPE:
+        glfwSetWindowShouldClose(*this, 1);
+        return true;
+      case GLFW_KEY_GRAVE_ACCENT:
         glfwSetInputMode(*this, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         return false;
       default:

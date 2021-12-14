@@ -11,7 +11,7 @@ namespace
         layout (location = 1) in vec2 vUV;
         out vec3 WorldPos_CS_in;
         out vec2 UV_CS_in;
-        uniform mat4 model;                                                                                    
+        uniform mat4 model;
         void main()
         {
             WorldPos_CS_in = (model * vec4(vPos, 1.f)).xyz;
@@ -23,6 +23,7 @@ namespace
         #version 450 core
         layout (vertices = 3) out;
         uniform vec3 gEyeWorldPos;
+        uniform float scale;
         in vec3 WorldPos_CS_in[];
         in vec2 UV_CS_in[];
         out vec3 WorldPos_ES_in[];
@@ -31,23 +32,17 @@ namespace
         {
             float AvgDistance = (Distance0 + Distance1) / 2.0;
 
-            if (AvgDistance <= 100.0) {
+            if (AvgDistance <= 250.0 * scale) {
                 return 32.0;
-            }
-            else if (AvgDistance <= 200.0) {
-                return 24.0;
-            }            
-            else if (AvgDistance <= 300.0) {
+            }        
+            else if (AvgDistance <= 500.0 * scale) {
                 return 16.0;
             }
-            else if (AvgDistance <= 400.0) {
+            else if (AvgDistance <= 1000.0 * scale) {
                 return 8.0;
             }
-            else if (AvgDistance <= 500.0) {
-                return 4.0;
-            }
             else {
-                return 1.0;
+                return 4.0;
             }
         }
         void main()
@@ -74,6 +69,14 @@ namespace
         uniform mat4 MVP;
         uniform mat4 model;                                                                                    
         uniform sampler2D tex;
+        uniform float scale;
+        
+        const float density = .0007;
+        const float gradient = 1.5;
+        uniform vec3 gEyeWorldPos;
+
+        out float visibility;
+
         vec2 interpolate2D(vec2 v0, vec2 v1, vec2 v2)                                                   
         {
             return vec2(gl_TessCoord.x) * v0 + vec2(gl_TessCoord.y) * v1 + vec2(gl_TessCoord.z) * v2;
@@ -87,8 +90,11 @@ namespace
             UV_FS_in = interpolate2D(UV_ES_in[0], UV_ES_in[1], UV_ES_in[2]);    
             Displacement = texture(tex, UV_FS_in.xy).x;
             vec3 worldPos = interpolate3D(WorldPos_ES_in[0], WorldPos_ES_in[1], WorldPos_ES_in[2]);
-            worldPos.y += 75.f * Displacement;  
+            worldPos.y += 75.f * Displacement * (scale / 2.f);  
             gl_Position = MVP * vec4(worldPos, 1.0);
+
+            float distance = length(worldPos.xyz - gEyeWorldPos);
+            visibility = clamp(2 * exp(-pow((distance * density), gradient)), 0.f, 1.f);
         }
     )"";
 
@@ -97,27 +103,12 @@ namespace
         out vec4 FragColor;
         in vec2 UV_FS_in;
         in float Displacement;
+        in float visibility;
         uniform sampler2D tex;
         void main()
         {
             FragColor = texture(tex, UV_FS_in);
-
-            if(Displacement < .05f)
-            {
-                float factor = 3.f;
-
-                FragColor.r *= .0f * factor;
-                FragColor.g *= .3f * factor;
-                FragColor.b *= .8f * factor;
-            }
-            else if(Displacement < .2f)
-            {
-                float factor = (.2f - Displacement);
-                factor = 1.f - clamp(factor, 0.f, 1.f);
-                FragColor.r *= .0f * factor;
-                FragColor.g *= factor * factor;
-                FragColor.b *= .0f * factor;
-            }
+            FragColor = mix(vec4(.5, .5, .5, 1.), FragColor, visibility);
         }
     )"";
 }
@@ -163,11 +154,13 @@ namespace Sane
 
                 mvp *= camera.lookat;
 
-                glm::mat4 trans = glm::scale(glm::mat4(1.f), glm::vec3(10, 1, 10));
+                float scale = 10.f;
+                glm::mat4 trans = glm::scale(glm::mat4(1.f), glm::vec3(scale, 1, scale));
                 glm::mat4 model_matrix = trans * glm::rotate(glm::mat4(1.f), 1.57079633f, { 1.f, 0.f, 0.f }) * glm::scale(glm::mat4(1.f), { 50, 50, 0 });
 
                 glUniformMatrix4fv(sProg.GetUniformLocaition("MVP"), 1, GL_FALSE, (const GLfloat*)&mvp[0][0]);
                 glUniform3f(sProg.GetUniformLocaition("gEyeWorldPos"), position.data.x, position.data.y, position.data.z);
+                glUniform1f(sProg.GetUniformLocaition("scale"), scale);
 
                 glUniformMatrix4fv(sProg.GetUniformLocaition("model"), 1, GL_FALSE, (const GLfloat*)&model_matrix[0][0]);
 

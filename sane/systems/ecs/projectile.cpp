@@ -77,7 +77,7 @@ namespace Sane
             auto view = registry_.view<Components::Projectile, Components::Position, Components::Translation>();
             view.each([&](auto entity, Components::Projectile& projectile, Components::Position& position, const Components::Translation& translation) {
                 projectile.lifetime += ts;
-                if (projectile.lifetime > 2'000)
+                if (projectile.lifetime > 10'000)
                 {
                     registry_.destroy(entity);
                     return;
@@ -85,7 +85,7 @@ namespace Sane
 
                 static float speed = .125f;
                 position.data.x += speed * translation.x;
-                position.data.y -= speed * translation.y;
+                position.data.y += speed * translation.y;
                 position.data.z += speed * translation.z;
                 numProjectilesAlive++;
                 }
@@ -103,12 +103,7 @@ namespace Sane
 
                 GLint old;
                 glGetIntegerv(GL_FRAMEBUFFER_BINDING, &old);
-
                 glBindFramebuffer(GL_FRAMEBUFFER, context.framebuffer);
-                glViewport(0, 0, context.width, context.height);
-
-                glClearColor(.05f, .06f, .11f, 1.f);
-                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
                 sProg.Bind();
 
@@ -119,7 +114,7 @@ namespace Sane
 
                 auto projView = registry_.view<Components::Projectile, Components::Position>();
                 projView.each([&](const auto entity, const Components::Projectile& projectile, const Components::Position& position) {
-                    glm::mat4 trans = glm::translate(mvp, { position.data.x, position.data.y, position.data.z });
+                    glm::mat4 trans = glm::translate(mvp, { position.data.x, -position.data.y + 6.f, position.data.z });
 
                     trans[0][0] = 1;
                     trans[0][1] = 0;
@@ -142,7 +137,6 @@ namespace Sane
 
                 vertices_buffer.Unbind();
                 sProg.Unbind();
-
                 glBindFramebuffer(GL_FRAMEBUFFER, old);
                 }
             );
