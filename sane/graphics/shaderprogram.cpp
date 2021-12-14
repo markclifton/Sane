@@ -22,7 +22,7 @@ namespace Sane
   ShaderProgram::~ShaderProgram()
   {
     glDeleteProgram(program_);
-    SANE_INFO("Destroyed shader program: {}", program_);
+    SANE_DEBUG("Destroyed shader program: {}", program_);
   }
 
   ShaderProgram& ShaderProgram::Finalize()

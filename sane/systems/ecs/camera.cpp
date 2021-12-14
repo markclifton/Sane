@@ -1,5 +1,7 @@
 #include "sane/systems/ecs/camera.hpp"
 
+#include "sane/logging/log.hpp"
+
 namespace
 {
     static const char* vs_camera = R""(
@@ -109,8 +111,22 @@ namespace Sane
 
         void Camera::Update(double ts)
         {
-            auto view = registry_.view<Components::Camera, Components::Position, Components::Rotation>();
-            view.each([&](const auto entity, Components::Camera& camera, Components::Position& position, Components::Rotation& rotation) {
+            auto view = registry_.view<Components::Camera, Components::RenderContext, Components::Position, Components::Rotation>();
+            view.each([&](const auto entity, Components::Camera& camera, const Components::RenderContext& context, Components::Position& position, Components::Rotation& rotation) {
+                // Clear Framebuffers
+                {
+                    GLint old;
+                    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &old);
+
+                    glBindFramebuffer(GL_FRAMEBUFFER, context.framebuffer);
+                    glViewport(0, 0, context.width, context.height);
+
+                    glClearColor(.2f, .3f, .8f, 1.f);
+                    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+                    glBindFramebuffer(GL_FRAMEBUFFER, old);
+                }
+
                 float xoffset = nextMousePosition.xpos - lastMousePosition.xpos;
                 float yoffset = lastMousePosition.ypos - nextMousePosition.ypos;
                 lastMousePosition = nextMousePosition;
@@ -121,17 +137,17 @@ namespace Sane
                 xoffset *= sensitivity;
                 yoffset *= sensitivity;
 
-                yaw -= xoffset;
-                pitch -= yoffset;
+                rotation.y -= xoffset;
+                rotation.z -= yoffset;
 
-                if (pitch > 89.0f)
-                    pitch = 89.0f;
-                if (pitch < -89.0f)
-                    pitch = -89.0f;
+                if (rotation.z > 89.0f)
+                    rotation.z = 89.0f;
+                if (rotation.z < -89.0f)
+                    rotation.z = -89.0f;
 
-                camera.front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-                camera.front.y = sin(glm::radians(pitch));
-                camera.front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+                camera.front.x = cos(glm::radians(rotation.y)) * cos(glm::radians(rotation.z));
+                camera.front.y = sin(glm::radians(rotation.z));
+                camera.front.z = sin(glm::radians(rotation.y)) * cos(glm::radians(rotation.z));
                 camera.front = glm::normalize(camera.front);
 
                 glm::vec3 up = glm::normalize(glm::cross(glm::normalize(glm::cross(camera.front, glm::vec3(0.0f, -1.0f, 0.0f))), camera.front));
@@ -155,17 +171,16 @@ namespace Sane
             );
         }
 
-        void Camera::RenderScene(glm::mat4 mvp)
+        void Camera::RenderScene(glm::mat4)
         {
+            const glm::mat4 mvp = glm::ortho(-1.f, 1.f, 1.f, -1.f, 1.f, 100.f);
+
             auto view = registry_.view<Components::RenderContext, Components::Camera>();
             view.each([&](const auto entity, const Components::RenderContext& context, const Components::Camera& camera) {
                 if (!camera.enabled)
                     return;
 
-                mvp = glm::ortho(-1.f, 1.f, 1.f, -1.f, 1.f, 100.f);
-
                 sProg.Bind();
-
                 vertices_buffer.Bind();
 
                 glEnableVertexAttribArray(0);
@@ -186,7 +201,6 @@ namespace Sane
                 glDisableVertexAttribArray(sProg.GetAttribLocation("vUV"));
                 glDisableVertexAttribArray(sProg.GetAttribLocation("vPos"));
                 vertices_buffer.Unbind();
-
                 sProg.Unbind();
                 }
             );

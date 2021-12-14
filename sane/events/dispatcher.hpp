@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "sane/events/event.hpp"
 
 namespace Sane
@@ -9,7 +11,7 @@ namespace Sane
         class Dispatcher
         {
         public:
-            void SubmitEvent(Event& event);
+            void SubmitEvent(std::unique_ptr<Event> event);
         };
     }
 }

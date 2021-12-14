@@ -153,9 +153,6 @@ namespace Sane
                 glBindFramebuffer(GL_FRAMEBUFFER, context.framebuffer);
                 glViewport(0, 0, context.width, context.height);
 
-                glClearColor(.2f, .3f, .8f, 1.f);
-                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
                 sProg.Bind();
 
                 vertices_buffer.Bind();
@@ -166,7 +163,7 @@ namespace Sane
 
                 mvp *= camera.lookat;
 
-                glm::mat4 trans = glm::scale(glm::mat4(1.f), glm::vec3(10, 1, 10));// glm::mat4(1.f); //glm::translate(glm::mat4(1.f), { position.data.x, -(position.data.y + 4), position.data.z });
+                glm::mat4 trans = glm::scale(glm::mat4(1.f), glm::vec3(10, 1, 10));
                 glm::mat4 model_matrix = trans * glm::rotate(glm::mat4(1.f), 1.57079633f, { 1.f, 0.f, 0.f }) * glm::scale(glm::mat4(1.f), { 50, 50, 0 });
 
                 glUniformMatrix4fv(sProg.GetUniformLocaition("MVP"), 1, GL_FALSE, (const GLfloat*)&mvp[0][0]);

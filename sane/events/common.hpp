@@ -5,6 +5,7 @@
 #include "sane/events/inputs.hpp"
 #include "sane/events/listener.hpp"
 #include "sane/events/load.hpp"
+#include "sane/events/queue.hpp"
 
 namespace Sane
 {

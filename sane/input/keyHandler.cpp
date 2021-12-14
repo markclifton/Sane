@@ -15,12 +15,7 @@ namespace Sane
         void KeyHandler::Process(int key, int scancode, int action, int mods)
         {
             KeyEvent ke{ key, scancode, action, mods };
-            Event e;
-            e.action = kKeyEvent;
-            e.detailedAction = action;
-            e.data = &ke;
-            e.size = sizeof(ke);
-            Instance().SubmitEvent(e);
+            Instance().SubmitEvent(std::make_unique<Event>(kKeyEvent, action, &ke, sizeof(ke)));
         }
     }
 }

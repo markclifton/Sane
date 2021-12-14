@@ -10,21 +10,21 @@ namespace Sane
         : size_(width, height)
     {
         Invalidate();
-        SANE_INFO("Created framebuffer: {}", framebuffer_);
+        SANE_DEBUG("Created framebuffer: {}", framebuffer_);
     }
 
     Framebuffer::~Framebuffer()
     {
         glDeleteTextures(2, attachments_);
         glDeleteFramebuffers(1, &framebuffer_);
-        SANE_INFO("Destroyed framebuffer: {}", framebuffer_);
+        SANE_DEBUG("Destroyed framebuffer: {}", framebuffer_);
     }
 
     void Framebuffer::Resize(int32_t width, int32_t height)
     {
         size_ = { width, height };
         Invalidate();
-        SANE_INFO("Resized framebuffer: {}", framebuffer_);
+        SANE_DEBUG("Resized framebuffer: {}", framebuffer_);
     }
 
     void Framebuffer::Invalidate()

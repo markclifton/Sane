@@ -57,7 +57,7 @@ namespace Sane
                 break;
                 case GLFW_RELEASE:
                     heldMouse = false;
-                    SANE_INFO("Num Projectiles: {}", numProjectiles);
+                    SANE_DEBUG("Num Projectiles: {}", numProjectiles);
                     break;
                 default:
                     return false;

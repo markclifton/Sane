@@ -9,13 +9,13 @@ namespace Sane
   Buffer::Buffer(int32_t target) : target_(target)
   {
     glGenBuffers(1, &buffer_);
-    SANE_INFO("Created {} buffer: {}", target_, buffer_);
+    SANE_DEBUG("Created {} buffer: {}", target_, buffer_);
   }
 
   Buffer::~Buffer()
   {
     glDeleteBuffers(1, &buffer_);
-    SANE_INFO("Destroyed {} buffer: {}", target_, buffer_);
+    SANE_DEBUG("Destroyed {} buffer: {}", target_, buffer_);
   }
 
   void Buffer::Bind()

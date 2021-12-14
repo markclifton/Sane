@@ -6,9 +6,9 @@ namespace Sane
 {
     namespace Events
     {
-        void Dispatcher::SubmitEvent(Event& event)
+        void Dispatcher::SubmitEvent(std::unique_ptr<Event> event)
         {
-            Queue::Instance().Submit(event);
+            Queue::Instance().Submit(std::move(event));
         }
     }
 }

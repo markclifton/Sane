@@ -12,6 +12,7 @@ namespace Sane
         uint32_t size{ 0 };
 
         Event();
+        ~Event();
         Event(uint32_t action, void* srcData, uint32_t size);
         Event(uint32_t action, uint32_t detailedAction, void* srcData, uint32_t size);
     };

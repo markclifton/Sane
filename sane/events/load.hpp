@@ -6,6 +6,13 @@ namespace Sane
 {
     struct LoadEvent
     {
-        std::string filepath;
+        LoadEvent(std::string path)
+        {
+            memcpy(filepath, path.c_str(), path.size());
+            size = path.size();
+        }
+
+        char filepath[1024];
+        uint32_t size{ 0 };
     };
 }

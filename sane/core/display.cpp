@@ -28,13 +28,7 @@ namespace
     Sane::Display* display = static_cast<Sane::Display*>(glfwGetWindowUserPointer(window));
     Sane::DisplayResizeEvent dre{ width, height };
 
-    Sane::Event e;
-    e.action = Sane::kDisplayResizeEvent;
-    e.detailedAction = 0;
-    e.data = &dre;
-    e.size = sizeof(dre);
-
-    display->SubmitEvent(e);
+    display->SubmitEvent(std::make_unique<Sane::Event>(Sane::kDisplayResizeEvent, &dre, sizeof(dre)));
   }
 
   static void error_callback(int error, const char* description) {
@@ -87,7 +81,7 @@ namespace Sane
 
     glfwSwapInterval(0);
 
-    SANE_INFO("Created display");
+    SANE_DEBUG("Created display");
   }
 
   Display::~Display() {
@@ -95,7 +89,7 @@ namespace Sane
     glfwDestroyWindow(window_);
     glfwTerminate();
 
-    SANE_INFO("Destroyed display");
+    SANE_DEBUG("Destroyed display");
   }
 
   void Display::Update() {

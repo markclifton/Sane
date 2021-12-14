@@ -3,18 +3,16 @@
 #include <entt/entt.hpp>
 
 #include "sane/core/display.hpp"
-#include "sane/systems/system.hpp"
-#include "sane/events/queue.hpp"
-#include "sane/graphics/framebuffer.hpp"
-
+#include "sane/events/common.hpp"
+#include "sane/graphics/common.hpp"
 #include "sane/systems/common.hpp"
 
 namespace Sane
 {
-    class App
+    class App : public Events::Dispatcher
     {
     public:
-        App(const char* name);
+        App(const char* name, uint32_t width, uint32_t height);
         virtual ~App() = default;
         void Run();
 
@@ -23,19 +21,14 @@ namespace Sane
         void PopLayer(System* layer);
         void PopOverlay(System* layer);
 
-        entt::registry& Registry() { return registry_; }
-
-        void DisplayConsole(bool Enable)
-        {
-            if (Enable)
-                PushOverlay(&console);
-            else
-                PopOverlay(&console);
-        }
+        entt::registry& Registry();
+        void DisplayConsole(bool Enable);
+        uint32_t GetColorAttachment();
 
     private:
+#ifndef NDEBUG
         Console console;
-
+#endif
         entt::registry registry_;
         Events::Queue& evt_queue_;
         Systems::Stack layers_;
@@ -44,8 +37,8 @@ namespace Sane
         ImguiBeginLayer imguiBegin_;
         ImguiEndLayer imguiEnd_;
 
-    protected:
         Framebuffer framebuffer;
+        GameWindow gameWindow;
     };
 
     App* CreateApp();

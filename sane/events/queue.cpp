@@ -18,10 +18,10 @@ namespace Sane
             return queue;
         }
 
-        void Queue::Submit(Event& evt)
+        void Queue::Submit(std::unique_ptr<Event> evt)
         {
             std::lock_guard<std::mutex> lock(Instance().processingMutex_);
-            Instance().events_.push_back(new Event(evt.action, evt.detailedAction, evt.data, evt.size));
+            Instance().events_.push_back(std::move(evt));
         }
 
         void Queue::Update(double ts)
@@ -35,7 +35,6 @@ namespace Sane
                     if (listener->ProcessEvent(*event))
                         break;
                 }
-                free(event->data);
             }
 
             Instance().events_.clear();
@@ -51,7 +50,7 @@ namespace Sane
             }
             else
             {
-                SANE_WARN("Event listener already added: {}", listener->Name());
+                SANE_DEBUG("Event listener already added: {}", listener->Name());
             }
         }
 
@@ -65,7 +64,7 @@ namespace Sane
             }
             else
             {
-                SANE_WARN("Event listener not found: {}", listener->Name());
+                SANE_DEBUG("Event listener not found: {}", listener->Name());
             }
         }
     }

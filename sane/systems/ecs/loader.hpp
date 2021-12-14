@@ -2,7 +2,9 @@
 
 #include "sane/ecs/common.hpp"
 #include "sane/events/common.hpp"
-#include "sane/systems/ecs/base.hpp"
+#include "sane/systems/common.hpp"
+
+namespace tinyxml2 { class XMLNode; }
 
 namespace Sane
 {
@@ -15,7 +17,10 @@ namespace Sane
             virtual bool ProcessEvent(Event& event) override;
 
         private:
-            bool LoadFile(const char* filepath);
+            bool LoadModels(tinyxml2::XMLNode* node);
+            bool LoadObjects(tinyxml2::XMLNode* node);
+            bool LoadSounds(tinyxml2::XMLNode* node);
+            bool LoadTextures(tinyxml2::XMLNode* node);
         };
     }
 }

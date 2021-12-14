@@ -7,6 +7,12 @@ namespace Sane
 {
     Event::Event() {}
 
+    Event::~Event()
+    {
+        if (data)
+            free(data);
+    }
+
     Event::Event(uint32_t action, void* srcData, uint32_t size)
         : action(action), size(size)
     {

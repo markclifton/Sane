@@ -21,7 +21,6 @@ namespace Sane
             Buffer indices_buffer;
 
             float x{ 0 }, y{ 0 }, z{ 0 };
-            float pitch{ 0 }, yaw{ -90.f };
 
             bool enableMouseMovement{ false };
             bool firstMovement{ false };

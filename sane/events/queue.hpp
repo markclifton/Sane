@@ -20,7 +20,7 @@ namespace Sane
         public:
             static Queue& Instance();
 
-            static void Submit(Event& evt);
+            static void Submit(std::unique_ptr<Event> evt);
             virtual void Update(double ts);
 
         private:
@@ -28,7 +28,7 @@ namespace Sane
             static void RemoveListener(Listener* listener);
 
             std::mutex processingMutex_;
-            std::vector<Event*> events_;
+            std::vector<std::unique_ptr<Event>> events_;
             std::vector<Listener*> listeners_;
         };
     }
